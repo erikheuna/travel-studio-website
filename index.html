@@ -1,0 +1,2485 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Travel Studio, agence de voyages : billets d'avion, hôtels, packages touristiques, conciergerie, visas, assurance voyage et conseils."
+    />
+    <title>Travel Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    />
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              creme: "#FDFCF0",
+              terre: "#5B3E2F",
+              soleil: "#E37B3C",
+              sable: "#F2DCC2",
+              nuit: "#3A271D",
+              peche: "#F6C9A0",
+            },
+            fontFamily: {
+              display: ["Marcellus", "Georgia", "Times New Roman", "serif"],
+              sans: [
+                "Jost",
+                "system-ui",
+                "Segoe UI",
+                "Helvetica",
+                "Arial",
+                "sans-serif",
+              ],
+              mono: [
+                "DM Mono",
+                "ui-monospace",
+                "Menlo",
+                "Consolas",
+                "monospace",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+      /* Layout: a single journey — globe at sunrise, take-off through the clouds, a horizontal boarding-tag corridor of services, postcards of destinations, then the arrival desk (contact). */
+      :root {
+        --creme: #fdfcf0;
+        --terre: #5b3e2f;
+        --soleil: #e37b3c;
+        --sable: #f2dcc2;
+        --peche: #f6c9a0;
+        --nuit: #3a271d;
+        --or: #f1a55b;
+        --ink: #3a271d;
+        --muted: #7a5f50;
+        --f-display: "Marcellus", Georgia, "Times New Roman", serif;
+        --f-body: "Jost", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+        --f-mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+        color-scheme: light;
+      }
+      html {
+        scroll-behavior: auto;
+      }
+      body {
+        background: var(--creme);
+        color: var(--ink);
+        font-family: var(--f-body);
+        font-size: 16px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0 0 auto;
+        height: env(safe-area-inset-top, 0px);
+        z-index: 60;
+        background: var(--creme);
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--f-display);
+        font-weight: 400;
+        text-wrap: balance;
+        letter-spacing: 0.01em;
+      }
+      .gutter {
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+      }
+      .eyebrow {
+        font-family: var(--f-mono);
+        font-size: 0.74rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+      .mono {
+        font-family: var(--f-mono);
+      }
+      :focus-visible {
+        outline: 2px solid var(--soleil);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      /* Sky + 3D canvas */
+      #sky {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: var(--creme);
+        transition: background 0.2s linear;
+      }
+      #gl {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* Nav */
+      #nav {
+        position: fixed;
+        top: env(safe-area-inset-top, 0px);
+        left: 0;
+        right: 0;
+        z-index: 50;
+        transition:
+          background 0.4s,
+          box-shadow 0.4s;
+      }
+      #nav.solid {
+        background: rgba(253, 252, 240, 0.86);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 1px 0 rgba(91, 62, 47, 0.12);
+      }
+      .navlink {
+        position: relative;
+        font-size: 0.92rem;
+        color: var(--terre);
+      }
+      .navlink::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 100%;
+        bottom: -4px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--soleil), var(--or));
+        transition: right 0.35s;
+      }
+      .navlink:hover::after {
+        right: 0;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.9rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        transition:
+          transform 0.25s,
+          box-shadow 0.25s,
+          background-position 0.6s;
+      }
+      .btn-sun {
+        color: var(--creme);
+        background: linear-gradient(
+          110deg,
+          var(--soleil),
+          var(--or) 45%,
+          var(--soleil) 70%,
+          var(--terre)
+        );
+        background-size: 220% 100%;
+        box-shadow: 0 10px 30px -10px rgba(227, 123, 60, 0.7);
+      }
+      .btn-sun:hover {
+        background-position: 100% 0;
+        transform: translateY(-2px);
+      }
+      .btn-ghost {
+        color: var(--terre);
+        border: 1.5px solid rgba(91, 62, 47, 0.35);
+      }
+      .btn-ghost:hover {
+        border-color: var(--terre);
+        transform: translateY(-2px);
+      }
+
+      .grad-text {
+        background: linear-gradient(
+          100deg,
+          var(--terre) 10%,
+          var(--soleil) 55%,
+          var(--or) 80%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      /* Departures board */
+      .board {
+        background: var(--nuit);
+        color: var(--sable);
+        border-radius: 14px;
+        box-shadow: 0 30px 60px -30px rgba(58, 39, 29, 0.8);
+      }
+      .flap {
+        display: inline-block;
+        min-width: 1.05em;
+        text-align: center;
+        background: #4a3427;
+        border-radius: 3px;
+        margin-right: 2px;
+        padding: 0 0.08em;
+        color: var(--or);
+        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+      }
+      .board-row {
+        display: grid;
+        grid-template-columns: 4.2rem 1fr auto;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 0.45rem 0;
+        border-top: 1px dashed rgba(242, 220, 194, 0.15);
+      }
+      .board-row:first-child {
+        border-top: 0;
+      }
+
+      /* Ticker */
+      .ticker {
+        display: flex;
+        width: max-content;
+        animation: tick 40s linear infinite;
+      }
+      @keyframes tick {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* Boarding */
+      #boarding {
+        height: 260vh;
+        position: relative;
+      }
+      #boarding .stick {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .pass-wrap {
+        perspective: 1200px;
+      }
+      .pass {
+        transform-style: preserve-3d;
+        background: var(--creme);
+        border-radius: 18px;
+        box-shadow: 0 40px 80px -30px rgba(58, 39, 29, 0.55);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        overflow: hidden;
+        max-width: 100%;
+      }
+      .pass .stub {
+        border-left: 2px dashed rgba(91, 62, 47, 0.3);
+        background: linear-gradient(160deg, var(--soleil), var(--or));
+        color: var(--creme);
+      }
+      .barcode {
+        height: 44px;
+        background: repeating-linear-gradient(
+          90deg,
+          var(--terre) 0 2px,
+          transparent 2px 4px,
+          var(--terre) 4px 5px,
+          transparent 5px 8px,
+          var(--terre) 8px 11px,
+          transparent 11px 12px
+        );
+      }
+
+      /* Services corridor */
+      #services {
+        position: relative;
+        color: var(--creme);
+        --p: 0;
+        background:
+          radial-gradient(
+            60vmax 45vmax at calc(var(--p) * 100%) 110%,
+            rgba(227, 123, 60, 0.55),
+            transparent 70%
+          ),
+          radial-gradient(
+            40vmax 30vmax at calc(100% - var(--p) * 80%) -10%,
+            rgba(241, 165, 91, 0.28),
+            transparent 70%
+          ),
+          linear-gradient(180deg, var(--nuit), var(--terre));
+      }
+      #svc-pin {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: clamp(16px, 3vh, 32px);
+        padding-block: clamp(70px, 10vh, 96px) 24px;
+        overflow: hidden;
+      }
+      #svc-viewport {
+        perspective: 1400px;
+        perspective-origin: 50% 50%;
+      }
+      #svc-track {
+        display: flex;
+        gap: clamp(18px, 3vw, 40px);
+        width: max-content;
+        padding-left: max(16px, 6vw);
+        padding-right: max(16px, 20vw);
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+      #svc-track {
+        pointer-events: none;
+      }
+      .svc {
+        pointer-events: auto;
+        width: min(78vw, 380px);
+        flex: 0 0 auto;
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+      .svc-card {
+        position: relative;
+        height: min(62vh, 520px);
+        border-radius: 22px;
+        background: var(--creme);
+        color: var(--ink);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transform-style: preserve-3d;
+        box-shadow: 0 50px 80px -40px rgba(0, 0, 0, 0.6);
+      }
+      .svc-art {
+        position: relative;
+        flex: 1 1 58%;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .svc-art .sun {
+        position: absolute;
+        width: 42%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        right: 10%;
+        top: 12%;
+        filter: blur(0.5px);
+      }
+      .svc-art svg {
+        position: absolute;
+        inset: auto 0 0 0;
+        width: 100%;
+        height: 88%;
+        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .svc-card:hover .svc-art svg {
+        transform: translateY(-6px) scale(1.04);
+      }
+      .svc-body {
+        padding: 20px 22px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .tag {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 2;
+        font-family: var(--f-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        background: var(--creme);
+        color: var(--terre);
+        padding: 0.3rem 0.65rem;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.4);
+      }
+      .tag::before {
+        content: "";
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        border: 1.5px solid var(--terre);
+        margin-right: 0.45rem;
+        vertical-align: 1px;
+      }
+      .route {
+        position: relative;
+        height: 30px;
+      }
+      .route .line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        border-top: 2px dashed rgba(242, 220, 194, 0.35);
+      }
+      .route .done {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 2px;
+        margin-top: -1px;
+        background: linear-gradient(90deg, var(--or), var(--soleil));
+        width: 0;
+      }
+      .route .plane {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 28px;
+        height: 28px;
+        margin: -14px 0 0 -14px;
+        color: var(--or);
+        transform: rotate(90deg);
+      }
+
+      /* Destinations */
+      .dest-grid {
+        perspective: 1600px;
+      }
+      .dest {
+        transform-style: preserve-3d;
+        cursor: default;
+      }
+      .dest-inner {
+        position: relative;
+        aspect-ratio: 3/4;
+        max-width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition:
+          transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+          box-shadow 0.5s;
+        box-shadow: 0 30px 50px -35px rgba(58, 39, 29, 0.7);
+      }
+      .dest:hover .dest-inner {
+        box-shadow: 0 45px 70px -35px rgba(58, 39, 29, 0.8);
+      }
+      .dest .l {
+        position: absolute;
+        inset: 0;
+        transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .dest svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .dest .cap {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 18px;
+        color: var(--creme);
+        background: linear-gradient(
+          0deg,
+          rgba(58, 39, 29, 0.85),
+          rgba(58, 39, 29, 0)
+        );
+      }
+      .dest .photo {
+        inset: -6%;
+      }
+      .dest .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        max-width: none;
+      }
+      .dest .photo .tint {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(241, 165, 91, 0.12) 0%,
+          rgba(227, 123, 60, 0.08) 45%,
+          rgba(58, 39, 29, 0.35) 100%
+        );
+        mix-blend-mode: multiply;
+      }
+      .dest .credit {
+        margin-top: 10px;
+        font-size: 0.66rem;
+        opacity: 0.7;
+        letter-spacing: 0.03em;
+      }
+      .chip {
+        font-family: var(--f-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        background: rgba(253, 252, 240, 0.18);
+        border: 1px solid rgba(253, 252, 240, 0.3);
+      }
+
+      /* Steps */
+      .step-line {
+        background: linear-gradient(
+          90deg,
+          var(--sable),
+          var(--soleil),
+          var(--terre)
+        );
+      }
+
+      /* Contact */
+      #contact {
+        background: linear-gradient(
+          160deg,
+          var(--soleil) 0%,
+          #c9622c 35%,
+          var(--terre) 75%,
+          var(--nuit)
+        );
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .field label {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        background: #fff;
+        border: 1.5px solid rgba(91, 62, 47, 0.18);
+        border-radius: 12px;
+        padding: 0.8rem 0.95rem;
+        color: var(--ink);
+        font: inherit;
+        width: 100%;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        outline: none;
+        border-color: var(--soleil);
+        box-shadow: 0 0 0 4px rgba(227, 123, 60, 0.15);
+      }
+      .field input.prefilled {
+        border-color: var(--soleil);
+        box-shadow: 0 0 0 4px rgba(227, 123, 60, 0.22);
+        transition: box-shadow 1.2s;
+      }
+      .field .err {
+        font-size: 0.8rem;
+        color: #b5431a;
+        min-height: 1em;
+      }
+
+      .reveal {
+        will-change: transform;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ticker {
+          animation: none;
+        }
+        #boarding {
+          height: auto;
+        }
+        #boarding .stick {
+          position: relative;
+          height: auto;
+          padding-block: 120px;
+        }
+        #svc-pin {
+          height: auto;
+        }
+        #svc-viewport {
+          overflow-x: auto;
+        }
+        .svc {
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sky"></div>
+    <canvas id="gl" aria-hidden="true"></canvas>
+
+    <!-- NAV -->
+    <header id="nav" class="gutter">
+      <div class="max-w-7xl mx-auto flex items-center justify-between py-3">
+        <a
+          href="#top"
+          class="flex items-center gap-3"
+          aria-label="Travel Studio, accueil"
+        >
+          <svg viewBox="0 0 100 72" class="w-12 h-9" aria-hidden="true">
+            <defs>
+              <linearGradient id="lg-sun" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#F1A55B" />
+                <stop offset="1" stop-color="#E37B3C" />
+              </linearGradient>
+            </defs>
+            <g stroke="#E37B3C" stroke-width="3.2" stroke-linecap="round">
+              <line x1="50" y1="6" x2="50" y2="14" />
+              <line x1="30" y1="12" x2="34" y2="19" />
+              <line x1="70" y1="12" x2="66" y2="19" />
+              <line x1="15" y1="25" x2="22" y2="29" />
+              <line x1="85" y1="25" x2="78" y2="29" />
+              <line x1="9" y1="42" x2="17" y2="42" />
+              <line x1="91" y1="42" x2="83" y2="42" />
+            </g>
+            <path d="M24 50 A26 26 0 0 1 76 50 Z" fill="url(#lg-sun)" />
+            <path
+              d="M12 56 Q44 38 90 50 Q62 52 42 68 Q24 66 12 56Z"
+              fill="#5B3E2F"
+            />
+            <path
+              d="M18 54 Q48 42 84 48"
+              stroke="#F2DCC2"
+              stroke-width="2.6"
+              fill="none"
+              stroke-linecap="round"
+            />
+            <g
+              transform="translate(70 30) rotate(58) scale(.62)"
+              fill="#5B3E2F"
+            >
+              <path
+                d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
+              />
+            </g>
+          </svg>
+          <span class="leading-none">
+            <span class="block font-display text-terre text-xl tracking-wide"
+              >TRAVEL STUDIO</span
+            >
+            <span
+              class="block mono text-[.62rem] tracking-[.3em] text-soleil mt-1"
+              >AGENCE DE VOYAGES</span
+            >
+          </span>
+        </a>
+        <nav
+          class="hidden md:flex items-center gap-8"
+          aria-label="Navigation principale"
+        >
+          <a class="navlink" href="#services">Services</a>
+          <a class="navlink" href="#destinations">Destinations</a>
+          <a class="navlink" href="#etapes">Comment ça marche</a>
+          <a class="btn btn-sun !py-2.5 !px-5 text-sm" href="#contact"
+            >Préparer mon voyage</a
+          >
+        </nav>
+        <a class="md:hidden btn btn-sun !py-2 !px-4 text-sm" href="#contact"
+          >Contact</a
+        >
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- HERO -->
+      <section
+        class="relative gutter pt-28 md:pt-36 pb-16 min-h-[92vh] flex items-center"
+      >
+        <div
+          class="max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-10 items-center"
+        >
+          <div class="md:col-span-6 lg:col-span-6 relative z-10">
+            <p class="eyebrow text-soleil mb-5 hero-in">
+              Billets · Hôtels · Visas · Séjours sur-mesure
+            </p>
+            <h1
+              class="text-[clamp(2.6rem,6.4vw,5.4rem)] leading-[1.02] text-terre hero-in"
+            >
+              Le monde<br />commence <span class="grad-text">ici.</span>
+            </h1>
+            <p
+              class="mt-6 text-lg text-[color:var(--muted)] max-w-[34rem] hero-in"
+            >
+              Travel Studio organise votre voyage de bout en bout : le vol,
+              l'hôtel, le visa, l'assurance, et chaque détail entre les deux.
+              Vous n'avez plus qu'à faire votre valise.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3 hero-in">
+              <a href="#contact" class="btn btn-sun"
+                >Demander un devis
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" /></svg
+              ></a>
+              <a href="#destinations" class="btn btn-ghost"
+                >Voir les destinations</a
+              >
+            </div>
+          </div>
+
+          <div
+            class="md:col-span-6 lg:col-span-5 lg:col-start-8 relative z-10 md:self-end"
+          >
+            <div
+              class="board p-5 md:p-6 mt-[38vh] md:mt-[46vh] hero-in"
+              aria-label="Tableau des départs"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <span class="eyebrow text-[color:var(--or)]">Départs</span>
+                <span
+                  class="mono text-xs text-[color:var(--sable)] opacity-70"
+                  id="clock"
+                  >--:--</span
+                >
+              </div>
+              <div id="board-rows" class="mono text-sm"></div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="absolute left-1/2 -translate-x-1/2 bottom-5 flex flex-col items-center gap-2 text-terre/70"
+          aria-hidden="true"
+        >
+          <span class="eyebrow text-[.62rem]">Défilez pour décoller</span>
+          <span
+            class="w-[1.5px] h-10 bg-gradient-to-b from-soleil to-transparent animate-pulse"
+          ></span>
+        </div>
+      </section>
+
+      <!-- TICKER -->
+      <div
+        class="relative overflow-hidden py-4 bg-terre/95 text-sable"
+        aria-hidden="true"
+      >
+        <div class="ticker mono text-sm tracking-[.2em]" id="ticker"></div>
+      </div>
+
+      <!-- BOARDING / CLOUDS -->
+      <section id="boarding" aria-label="Embarquement">
+        <div class="stick gutter">
+          <div
+            class="max-w-5xl w-full mx-auto text-center flex flex-col items-center gap-8"
+          >
+            <p class="eyebrow text-terre" id="b-eyebrow">
+              Porte TS-08 · Embarquement immédiat
+            </p>
+            <h2
+              id="b-title"
+              class="text-[clamp(2.2rem,7vw,6rem)] leading-[1] text-terre"
+            >
+              Au-dessus des nuages,<br /><span class="grad-text"
+                >tout est déjà prévu.</span
+              >
+            </h2>
+            <div class="pass-wrap w-full flex justify-center">
+              <div class="pass w-[min(640px,100%)] text-left" id="pass">
+                <div class="p-5 md:p-7 min-w-0">
+                  <div class="flex items-center justify-between gap-4">
+                    <span class="font-display text-terre text-lg"
+                      >TRAVEL STUDIO</span
+                    >
+                    <span class="eyebrow text-soleil text-[.62rem]"
+                      >Carte d'embarquement</span
+                    >
+                  </div>
+                  <div class="mt-5 flex items-end justify-between gap-3">
+                    <div>
+                      <div
+                        class="eyebrow text-[.6rem] text-[color:var(--muted)]"
+                      >
+                        De
+                      </div>
+                      <div class="font-display text-3xl md:text-4xl text-terre">
+                        ICI
+                      </div>
+                    </div>
+                    <svg
+                      viewBox="-24 -24 48 48"
+                      class="w-8 h-8 mb-2 shrink-0 text-soleil"
+                      style="transform: rotate(90deg)"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
+                      />
+                    </svg>
+                    <div class="text-right">
+                      <div
+                        class="eyebrow text-[.6rem] text-[color:var(--muted)]"
+                      >
+                        Vers
+                      </div>
+                      <div
+                        class="font-display text-3xl md:text-4xl text-soleil"
+                      >
+                        AILLEURS
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-5 grid grid-cols-4 gap-3 text-sm">
+                    <div>
+                      <div
+                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
+                      >
+                        Passager
+                      </div>
+                      <div class="mono text-terre">VOUS</div>
+                    </div>
+                    <div>
+                      <div
+                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
+                      >
+                        Porte
+                      </div>
+                      <div class="mono text-terre">TS-08</div>
+                    </div>
+                    <div>
+                      <div
+                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
+                      >
+                        Siège
+                      </div>
+                      <div class="mono text-terre">1A</div>
+                    </div>
+                    <div>
+                      <div
+                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
+                      >
+                        Classe
+                      </div>
+                      <div class="mono text-terre">SUR-MESURE</div>
+                    </div>
+                  </div>
+                  <div class="barcode mt-5 rounded-sm opacity-80"></div>
+                </div>
+                <div
+                  class="stub p-4 md:p-6 flex flex-col justify-between w-[30vw] max-w-[150px] min-w-[96px]"
+                >
+                  <span class="eyebrow text-[.56rem]">Vol</span>
+                  <span class="font-display text-2xl md:text-3xl leading-none"
+                    >TS<br />2026</span
+                  >
+                  <span class="mono text-[.7rem] opacity-90">BON VOYAGE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES : horizontal 3D corridor -->
+      <section id="services" aria-label="Nos services">
+        <div id="svc-pin">
+          <div class="gutter">
+            <div
+              class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+            >
+              <div>
+                <p class="eyebrow text-[color:var(--or)]">
+                  Nos services · 8 escales
+                </p>
+                <h2 class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] mt-2">
+                  Tout votre voyage,<br class="hidden md:block" />
+                  sous un seul toit.
+                </h2>
+              </div>
+              <p class="max-w-sm text-sable/80 text-[.98rem]">
+                Faites défiler : chaque étiquette bagage correspond à un service
+                que nous prenons en charge pour vous.
+              </p>
+            </div>
+            <div class="max-w-7xl mx-auto mt-5 route" aria-hidden="true">
+              <div class="line"></div>
+              <div class="done" id="route-done"></div>
+              <svg class="plane" id="route-plane" viewBox="-24 -24 48 48">
+                <path
+                  fill="currentColor"
+                  d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
+                />
+              </svg>
+            </div>
+          </div>
+          <div id="svc-viewport">
+            <div id="svc-track"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESTINATIONS -->
+      <section
+        id="destinations"
+        class="relative gutter py-24 md:py-32 bg-creme"
+      >
+        <div class="max-w-7xl mx-auto">
+          <div class="grid md:grid-cols-12 gap-6 items-end mb-12">
+            <div class="md:col-span-7 reveal">
+              <p class="eyebrow text-soleil">Destinations</p>
+              <h2
+                class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] text-terre mt-2"
+              >
+                Où partez-vous<br />cette saison ?
+              </h2>
+            </div>
+            <p class="md:col-span-5 text-[color:var(--muted)] reveal">
+              Une sélection de destinations que nous organisons régulièrement.
+              Passez la souris sur une carte postale pour la voir en relief ;
+              chacune indique la meilleure période pour partir.
+            </p>
+          </div>
+          <div
+            class="dest-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6"
+            id="dest-grid"
+          ></div>
+          <p class="mt-8 text-sm text-[color:var(--muted)] reveal">
+            Votre destination n'y figure pas ? Nous organisons des voyages vers
+            la plupart des pays : indiquez-la simplement dans le formulaire.
+          </p>
+        </div>
+      </section>
+
+      <!-- STEPS -->
+      <section
+        id="etapes"
+        class="relative gutter py-24 md:py-28"
+        style="background: linear-gradient(180deg, var(--creme), var(--sable))"
+      >
+        <div class="max-w-7xl mx-auto">
+          <div class="max-w-2xl reveal">
+            <p class="eyebrow text-soleil">Comment ça marche</p>
+            <h2
+              class="text-[clamp(2rem,4.2vw,3.2rem)] leading-[1.05] text-terre mt-2"
+            >
+              De la première question au retour, quatre étapes.
+            </h2>
+          </div>
+          <div class="relative mt-14">
+            <div
+              class="step-line hidden md:block absolute left-0 right-0 top-6 h-[2px] origin-left"
+              id="step-line"
+            ></div>
+            <ol class="grid md:grid-cols-4 gap-8 relative">
+              <li class="reveal">
+                <span
+                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  >1</span
+                >
+                <h3 class="text-xl text-terre mt-5">Vous nous écrivez</h3>
+                <p class="text-[color:var(--muted)] mt-2">
+                  Destination, dates, budget, nombre de voyageurs : quelques
+                  lignes suffisent pour commencer.
+                </p>
+              </li>
+              <li class="reveal">
+                <span
+                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  >2</span
+                >
+                <h3 class="text-xl text-terre mt-5">Proposition sur-mesure</h3>
+                <p class="text-[color:var(--muted)] mt-2">
+                  Un conseiller compare les vols et hébergements et vous envoie
+                  une proposition détaillée.
+                </p>
+              </li>
+              <li class="reveal">
+                <span
+                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  >3</span
+                >
+                <h3 class="text-xl text-terre mt-5">
+                  Réservations et formalités
+                </h3>
+                <p class="text-[color:var(--muted)] mt-2">
+                  Billets, hôtels, dossier de visa et assurance : nous réservons
+                  et vérifions chaque document.
+                </p>
+              </li>
+              <li class="reveal">
+                <span
+                  class="w-12 h-12 rounded-full bg-soleil flex items-center justify-center font-display text-creme text-xl relative"
+                  >4</span
+                >
+                <h3 class="text-xl text-terre mt-5">Bon voyage</h3>
+                <p class="text-[color:var(--muted)] mt-2">
+                  Vous partez avec un carnet de voyage complet et un contact
+                  joignable pendant votre séjour.
+                </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section
+        id="contact"
+        class="relative gutter py-24 md:py-32 text-creme overflow-hidden"
+      >
+        <div
+          class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-14 items-start relative"
+        >
+          <div class="lg:col-span-5 reveal">
+            <p class="eyebrow text-sable">Contact</p>
+            <h2 class="text-[clamp(2.2rem,4.8vw,3.8rem)] leading-[1.03] mt-2">
+              Racontez-nous<br />le voyage dont<br />vous rêvez.
+            </h2>
+            <p class="mt-6 text-sable/90 max-w-md">
+              Remplissez le formulaire : votre demande arrive directement à la
+              direction de Travel Studio, et un conseiller vous répond par
+              e-mail.
+            </p>
+            <div
+              class="mt-8 rounded-2xl p-5 bg-white/10 border border-white/20 backdrop-blur-sm max-w-md"
+            >
+              <div class="eyebrow text-[.62rem] text-sable/80">
+                Écrire directement
+              </div>
+              <div
+                class="mt-2 flex flex-wrap items-center gap-3 justify-between"
+              >
+                <span
+                  class="mono text-base md:text-lg select-all break-all"
+                  id="mail-addr"
+                  >direction@travelstudio.com</span
+                >
+                <button
+                  type="button"
+                  id="copy-mail"
+                  class="text-sm px-3 py-1.5 rounded-full border border-white/40 hover:bg-white/15 transition"
+                >
+                  Copier l'adresse
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <form
+            id="form"
+            class="lg:col-span-7 bg-creme text-nuit rounded-[24px] p-6 md:p-9 shadow-2xl grid sm:grid-cols-2 gap-5 reveal"
+            novalidate
+          >
+            <input
+              type="hidden"
+              name="_subject"
+              value="Nouvelle demande · site Travel Studio"
+            />
+            <div class="field">
+              <label for="f-name">Nom complet</label
+              ><input
+                id="f-name"
+                name="nom"
+                autocomplete="name"
+                placeholder="Awa Mbarga"
+                required
+              /><span class="err" data-for="f-name"></span>
+            </div>
+            <div class="field">
+              <label for="f-email">E-mail</label
+              ><input
+                id="f-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="vous@exemple.com"
+                required
+              /><span class="err" data-for="f-email"></span>
+            </div>
+            <div class="field sm:col-span-2">
+              <label for="f-subject">Objet</label
+              ><input
+                id="f-subject"
+                name="objet"
+                placeholder="Ex. : Conseils, Visas, Billets d’avion…"
+                required
+              /><span class="err" data-for="f-subject"></span>
+            </div>
+            <div class="field">
+              <label for="f-phone">Téléphone</label
+              ><input
+                id="f-phone"
+                name="telephone"
+                type="tel"
+                autocomplete="tel"
+                placeholder="+237 6 00 00 00 00"
+              /><span class="err"></span>
+            </div>
+            <div class="field">
+              <label for="f-service">Service souhaité</label>
+              <select id="f-service" name="service" required>
+                <option value="">Choisir un service</option></select
+              ><span class="err" data-for="f-service"></span>
+            </div>
+            <div class="field">
+              <label for="f-dest">Destination</label>
+              <input
+                id="f-dest"
+                name="destination"
+                list="dest-list"
+                placeholder="Maroc, Maldives…"
+              /><datalist id="dest-list"></datalist><span class="err"></span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 min-w-0">
+              <div class="field">
+                <label for="f-date">Départ</label
+                ><input id="f-date" name="date_depart" type="date" /><span
+                  class="err"
+                ></span>
+              </div>
+              <div class="field">
+                <label for="f-pax">Voyageurs</label
+                ><input
+                  id="f-pax"
+                  name="voyageurs"
+                  type="number"
+                  min="1"
+                  max="99"
+                  value="2"
+                /><span class="err"></span>
+              </div>
+            </div>
+            <div class="field sm:col-span-2">
+              <label for="f-msg">Votre projet</label
+              ><textarea
+                id="f-msg"
+                name="message"
+                rows="4"
+                placeholder="Dates flexibles, budget, envies particulières…"
+                required
+              ></textarea
+              ><span class="err" data-for="f-msg"></span>
+            </div>
+            <div
+              class="sm:col-span-2 flex flex-wrap items-center justify-between gap-4"
+            >
+              <p class="text-xs text-[color:var(--muted)] max-w-xs">
+                Vos informations servent uniquement à répondre à votre demande.
+              </p>
+              <button type="submit" class="btn btn-sun" id="f-submit">
+                Envoyer ma demande
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+              </button>
+            </div>
+            <div
+              id="f-status"
+              class="sm:col-span-2"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-nuit text-sable gutter py-12">
+      <div
+        class="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:items-center md:justify-between"
+      >
+        <div>
+          <div class="font-display text-2xl text-creme">TRAVEL STUDIO</div>
+          <div class="mono text-xs tracking-[.25em] text-soleil mt-1">
+            GUIDE DU VOYAGEUR
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-6 text-sm">
+          <a href="#services" class="hover:text-creme">Services</a>
+          <a href="#destinations" class="hover:text-creme">Destinations</a>
+          <a href="#contact" class="hover:text-creme">Contact</a>
+          <span class="mono">direction@travelstudio.com</span>
+        </div>
+        <div class="text-xs opacity-60">
+          © 2026 Travel Studio · Photos des destinations :
+          <a
+            href="https://www.magnific.com"
+            target="_blank"
+            rel="noopener"
+            class="underline"
+            >Magnific (ex-Freepik)</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (() => {
+        const PLANE =
+          "M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z";
+        const C = {
+          creme: "#FDFCF0",
+          terre: "#5B3E2F",
+          soleil: "#E37B3C",
+          sable: "#F2DCC2",
+          peche: "#F6C9A0",
+          nuit: "#3A271D",
+          or: "#F1A55B",
+        };
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const MAIL = "direction@travelstudio.com";
+
+        /* ---------------- DATA ---------------- */
+        const DEST = [
+          {
+            pays: "Maroc",
+            ville: "Marrakech",
+            code: "RAK",
+            lat: 31.6,
+            lon: -8.0,
+            txt: "Médinas, riads et nuits dans le désert d'Agafay.",
+            saison: "Mars–mai · Sept–nov",
+            sky: ["#F9D9B4", "#E37B3C"],
+            art: "maroc",
+            photo:
+              "https://img.magnific.com/free-photo/vertical-view-famous-koutoubia-mosque-marrakech_268835-3960.jpg?w=740",
+            credit: "vwalakte",
+          },
+          {
+            pays: "France",
+            ville: "Paris",
+            code: "CDG",
+            lat: 49.0,
+            lon: 2.55,
+            txt: "Paris, la Provence et la Côte d’Azur.",
+            saison: "Avril–juin · Sept–oct",
+            sky: ["#F4E6D6", "#E9B98E"],
+            art: "france",
+            photo:
+              "https://img.magnific.com/free-photo/beautiful-vertical-shot-eiffel-tower-bright-blue-sky_181624-39894.jpg?w=740",
+            credit: "wirestock",
+          },
+          {
+            pays: "États-Unis",
+            ville: "New York",
+            code: "JFK",
+            lat: 40.6,
+            lon: -73.8,
+            txt: "New York, Miami, Los Angeles et les parcs nationaux.",
+            saison: "Avril–juin · Sept–nov",
+            sky: ["#F1A55B", "#7A4A36"],
+            art: "usa",
+            photo:
+              "https://img.magnific.com/free-photo/new-york-city-skyline-aerial-view-sunset-with-colorful-cloud-skyscrapers-midtown-manhattan_649448-2373.jpg?w=740",
+            credit: "TravelScape",
+          },
+          {
+            pays: "Maldives",
+            ville: "Malé",
+            code: "MLE",
+            lat: 4.2,
+            lon: 73.5,
+            txt: "Lagons turquoise et villas sur pilotis.",
+            saison: "Nov–avril",
+            sky: ["#FBE7C9", "#9CCBC3"],
+            art: "maldives",
+            photo:
+              "https://img.magnific.com/free-photo/beautiful-water-villas-tropical-maldives-island-sunrise-time_1232-4484.jpg?w=740",
+            credit: "jannoon028",
+          },
+          {
+            pays: "Émirats",
+            ville: "Dubaï",
+            code: "DXB",
+            lat: 25.25,
+            lon: 55.36,
+            txt: "Dubaï, Abu Dhabi et safaris dans les dunes.",
+            saison: "Nov–mars",
+            sky: ["#F6C9A0", "#C9622C"],
+            art: "dubai",
+            photo:
+              "https://img.magnific.com/free-photo/view-dubai-marina-sunrise-uae_268835-1056.jpg?w=740",
+            credit: "vwalakte",
+          },
+          {
+            pays: "Turquie",
+            ville: "Istanbul",
+            code: "IST",
+            lat: 41.3,
+            lon: 28.75,
+            txt: "Istanbul et les montgolfières de Cappadoce.",
+            saison: "Avril–juin · Sept–oct",
+            sky: ["#FCE3C2", "#E8946A"],
+            art: "turquie",
+            photo:
+              "https://img.magnific.com/free-photo/hot-air-balloons-hills-fields-sunset-cappadocia-turkey_181624-20680.jpg?w=740",
+            credit: "wirestock",
+          },
+          {
+            pays: "Japon",
+            ville: "Tokyo",
+            code: "HND",
+            lat: 35.55,
+            lon: 139.78,
+            txt: "Tokyo, Kyoto et Osaka, des néons aux temples.",
+            saison: "Mars–mai · Oct–nov",
+            sky: ["#FBEADB", "#EFB79A"],
+            art: "japon",
+            photo:
+              "https://img.magnific.com/free-photo/cherry-blossoms-spring-chureito-pagoda-fuji-mountain-japan_335224-213.jpg?w=740",
+            credit: "tawatchai07",
+          },
+          {
+            pays: "Kenya",
+            ville: "Nairobi",
+            code: "NBO",
+            lat: -1.32,
+            lon: 36.93,
+            txt: "Safari au Masai Mara et plages de Diani.",
+            saison: "Juil–oct",
+            sky: ["#F8C47F", "#C55A26"],
+            art: "kenya",
+            photo:
+              "https://img.magnific.com/free-photo/elephants-standing-each-other-green-field-kenya-africa_181624-16964.jpg?w=740",
+            credit: "wirestock",
+          },
+        ];
+
+        const SERVICES = [
+          {
+            code: "BIL",
+            o: "Billets d’avion",
+            t: "Réservation de billets d’avion",
+            d: "Nous comparons les compagnies et les itinéraires pour trouver le meilleur vol au meilleur prix, en classe éco comme en affaires.",
+            sky: ["#FBE2C4", "#F1A55B"],
+            art: "billet",
+          },
+          {
+            code: "HTL",
+            o: "Hôtels",
+            t: "Réservation d’hôtels",
+            d: "Hôtels, riads, resorts ou appartements : un hébergement choisi selon votre budget, votre quartier et vos envies.",
+            sky: ["#F6D6BC", "#E37B3C"],
+            art: "hotel",
+          },
+          {
+            code: "PKG",
+            o: "Packages touristiques",
+            t: "Packages touristiques",
+            d: "Vol, hébergement, transferts et excursions réunis dans une seule offre, prête à réserver.",
+            sky: ["#FCE9CF", "#E89A5E"],
+            art: "package",
+          },
+          {
+            code: "CNC",
+            o: "Conciergerie",
+            t: "Conciergerie",
+            d: "Transferts, tables au restaurant, guides privés, billets de spectacle : on s’occupe des détails sur place.",
+            sky: ["#F3DCC8", "#C9622C"],
+            art: "concierge",
+          },
+          {
+            code: "APV",
+            o: "Assistance procédure visa",
+            t: "Assistance procédure visa",
+            d: "Liste des pièces, remplissage des formulaires, prise de rendez-vous : nous vous accompagnons à chaque étape du dossier.",
+            sky: ["#FBE7D2", "#F1A55B"],
+            art: "dossier",
+          },
+          {
+            code: "VIS",
+            o: "Visas",
+            t: "Visas",
+            d: "Visas touristiques, d’affaires et e-visas : nous déposons et suivons votre demande jusqu’à l’obtention.",
+            sky: ["#F8D9BE", "#E37B3C"],
+            art: "passeport",
+          },
+          {
+            code: "ASS",
+            o: "Assurance voyage",
+            t: "Assurance voyage",
+            d: "Frais médicaux, rapatriement, annulation, bagages : une couverture adaptée à votre séjour et à votre destination.",
+            sky: ["#F6E2CF", "#D9733A"],
+            art: "assurance",
+          },
+          {
+            code: "CSL",
+            o: "Conseils",
+            t: "Conseils",
+            d: "Meilleure saison, budget, itinéraire, formalités : nos conseillers répondent à toutes vos questions avant le départ.",
+            sky: ["#FCEBD5", "#E89A5E"],
+            art: "conseil",
+          },
+        ];
+
+        /* ---------------- SVG ART ---------------- */
+        const plane = (x, y, r, s, fill) =>
+          `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" fill="${fill}"><path d="${PLANE}"/></g>`;
+        const ART = {
+          billet: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <path d="M10 112 Q60 80 120 104 T200 92" stroke="${C.creme}" stroke-width="2" stroke-dasharray="4 6" fill="none"/>
+  <g transform="translate(28 64) rotate(-8)"><rect width="128" height="58" rx="8" fill="${C.creme}"/><rect x="92" width="36" height="58" rx="8" fill="${C.soleil}"/>
+  <line x1="92" y1="6" x2="92" y2="52" stroke="${C.terre}" stroke-dasharray="3 3"/>
+  <text x="12" y="22" font-family="DM Mono,monospace" font-size="11" fill="${C.terre}">DLA ✈ CDG</text>
+  <rect x="12" y="32" width="60" height="4" rx="2" fill="${C.sable}"/><rect x="12" y="41" width="42" height="4" rx="2" fill="${C.sable}"/>
+  <text x="99" y="35" font-family="DM Mono,monospace" font-size="9" fill="${C.creme}">1A</text></g>
+  ${plane(150, 36, 52, 1.15, C.terre)}</svg>`,
+          hotel: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <rect x="0" y="122" width="200" height="18" fill="${C.terre}"/>
+  <rect x="52" y="30" width="80" height="94" fill="${C.creme}"/><rect x="52" y="22" width="80" height="12" fill="${C.terre}"/>
+  ${[0, 1, 2, 3, 4].map((r) => [0, 1, 2, 3].map((c) => `<rect x="${60 + c * 18}" y="${42 + r * 14}" width="10" height="8" rx="1.5" fill="${(r + c) % 3 ? C.sable : C.or}"/>`).join("")).join("")}
+  <rect x="84" y="108" width="16" height="16" fill="${C.soleil}"/>
+  <rect x="138" y="70" width="40" height="54" fill="${C.sable}"/>${[0, 1, 2].map((r) => `<rect x="146" y="${78 + r * 14}" width="24" height="7" rx="1.5" fill="${C.creme}"/>`).join("")}
+  <g transform="translate(18 92) rotate(-25)"><circle r="12" fill="none" stroke="${C.terre}" stroke-width="5"/><rect x="10" y="-3" width="32" height="6" fill="${C.terre}"/><rect x="32" y="2" width="5" height="8" fill="${C.terre}"/></g></svg>`,
+          package: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <path d="M0 124 Q100 106 200 124 V140 H0Z" fill="${C.sable}"/>
+  <path d="M150 124 Q144 80 152 46" stroke="${C.terre}" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <g fill="${C.terre}" transform="translate(152 46)"><path d="M0 0 Q-30 -12 -44 6 Q-22 -4 0 0Z"/><path d="M0 0 Q28 -16 44 2 Q20 -6 0 0Z"/><path d="M0 0 Q-8 -30 -28 -34 Q-6 -20 0 0Z"/><path d="M0 0 Q14 -30 34 -30 Q10 -18 0 0Z"/></g>
+  <rect x="40" y="56" width="84" height="66" rx="9" fill="${C.soleil}"/><rect x="66" y="44" width="32" height="14" rx="5" fill="none" stroke="${C.terre}" stroke-width="5"/>
+  <rect x="54" y="56" width="8" height="66" fill="${C.terre}"/><rect x="102" y="56" width="8" height="66" fill="${C.terre}"/>
+  <circle cx="82" cy="90" r="11" fill="${C.creme}"/><path d="M76 90 h12 M82 84 v12" stroke="${C.soleil}" stroke-width="3"/></svg>`,
+          concierge: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <rect x="20" y="112" width="160" height="14" rx="3" fill="${C.terre}"/>
+  <path d="M46 108 Q46 52 100 52 Q154 52 154 108Z" fill="${C.or}"/><path d="M58 100 Q60 66 96 62" stroke="${C.creme}" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>
+  <rect x="40" y="104" width="120" height="9" rx="4" fill="${C.soleil}"/><rect x="94" y="40" width="12" height="13" rx="3" fill="${C.terre}"/><circle cx="100" cy="38" r="7" fill="${C.terre}"/>
+  <path d="M130 30 l8 -8 M146 46 l10 -2 M64 30 l-8 -8" stroke="${C.terre}" stroke-width="3" stroke-linecap="round"/></svg>`,
+          dossier: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <path d="M34 40 h42 l10 10 h80 v80 H34Z" fill="${C.terre}"/>
+  <g transform="rotate(-6 100 80)"><rect x="56" y="22" width="90" height="104" rx="5" fill="${C.creme}"/>
+  ${[0, 1, 2, 3].map((i) => `<rect x="68" y="${40 + i * 20}" width="11" height="11" rx="2" fill="none" stroke="${C.soleil}" stroke-width="2.4"/>${i < 3 ? `<path d="M70 ${46 + i * 20} l3 3 l6 -7" stroke="${C.terre}" stroke-width="2.4" fill="none"/>` : ""}<rect x="86" y="${43 + i * 20}" width="${44 - i * 6}" height="5" rx="2.5" fill="${C.sable}"/>`).join("")}</g>
+  <path d="M34 66 h132 v64 H34Z" fill="${C.soleil}" opacity=".92"/><rect x="88" y="84" width="24" height="7" rx="3.5" fill="${C.creme}"/></svg>`,
+          passeport: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <g transform="rotate(-10 90 80)"><rect x="46" y="22" width="84" height="112" rx="8" fill="${C.terre}"/>
+  <circle cx="88" cy="68" r="18" fill="none" stroke="${C.or}" stroke-width="2.5"/><path d="M70 68 h36 M88 50 q-10 18 0 36 q10 -18 0 -36" stroke="${C.or}" stroke-width="2" fill="none"/>
+  <text x="88" y="110" text-anchor="middle" font-family="Marcellus,serif" font-size="11" letter-spacing="2" fill="${C.or}">PASSEPORT</text></g>
+  <g transform="translate(140 50) rotate(14)"><circle r="30" fill="none" stroke="${C.soleil}" stroke-width="3"/><circle r="23" fill="none" stroke="${C.soleil}" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <text y="-2" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="${C.soleil}">VISA</text><text y="11" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="${C.soleil}">ACCORDÉ</text></g></svg>`,
+          assurance: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <path d="M100 18 L150 34 V72 Q150 112 100 132 Q50 112 50 72 V34Z" fill="${C.terre}"/>
+  <path d="M100 30 L138 42 V72 Q138 104 100 120Z" fill="${C.soleil}"/>
+  <path d="M80 74 l14 14 l28 -30" stroke="${C.creme}" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(34 92)"><path d="M-22 0 Q0 -26 22 0 Q15 -6 11 0 Q5 -6 0 0 Q-5 -6 -11 0 Q-15 -6 -22 0Z" fill="${C.or}"/><path d="M0 0 v22 q0 6 -6 4" stroke="${C.terre}" stroke-width="3" fill="none"/></g></svg>`,
+          conseil: `<svg viewBox="0 0 200 140" aria-hidden="true">
+  <path d="M14 46 L64 34 L114 46 L176 34 V122 L114 134 L64 122 L14 134Z" fill="${C.creme}"/>
+  <path d="M64 34 V122 M114 46 V134" stroke="${C.sable}" stroke-width="2"/>
+  <path d="M30 108 Q60 70 92 96 T152 62" stroke="${C.soleil}" stroke-width="2.5" stroke-dasharray="5 5" fill="none"/>
+  <circle cx="152" cy="62" r="5" fill="${C.soleil}"/>
+  <g transform="translate(70 72)"><circle r="30" fill="${C.terre}"/><circle r="24" fill="${C.creme}"/><path d="M0 -18 L6 0 L0 18 L-6 0Z" fill="${C.soleil}"/><path d="M0 0 L6 0 L0 18 L-6 0Z" fill="${C.terre}"/><circle r="2.5" fill="${C.creme}"/></g></svg>`,
+        };
+
+        /* Destination postcards: back layer (sky/sun/far) + front layer (landmark) */
+        const DART = {
+          maroc: {
+            back: `<circle cx="210" cy="140" r="56" fill="${C.or}" opacity=".9"/><path d="M0 250 Q80 200 160 240 T300 220 V360 H0Z" fill="#D88A52"/>`,
+            front: `<path d="M0 290 Q90 250 170 286 T300 270 V360 H0Z" fill="${C.terre}"/>
+  <g fill="#8A5A3E"><rect x="62" y="120" width="34" height="140"/><rect x="58" y="112" width="42" height="12"/><rect x="72" y="92" width="14" height="22"/><circle cx="79" cy="88" r="5"/></g>
+  <g fill="#6E4633"><rect x="70" y="140" width="8" height="12" rx="4"/><rect x="80" y="170" width="8" height="12" rx="4"/></g>
+  <path d="M150 300 v-70 q0-40 40-40 q40 0 40 40 v70Z" fill="#7A4A36"/><path d="M164 300 v-62 q0-30 26-30 q26 0 26 30 v62Z" fill="${C.or}" opacity=".85"/>`,
+          },
+          france: {
+            back: `<circle cx="80" cy="110" r="44" fill="${C.creme}" opacity=".8"/><path d="M0 270 h300 v90 H0Z" fill="#C9A386"/><g fill="#B48C70">${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${i * 44}" y="${236 - ((i * 37) % 30)}" width="36" height="${40 + ((i * 37) % 30)}"/>`).join("")}</g>`,
+            front: `<g fill="${C.terre}"><path d="M150 40 L156 40 L162 120 L176 120 L178 128 L172 128 L196 240 L212 240 L214 250 L206 250 L230 320 L200 320 Q192 284 153 284 Q114 284 106 320 L76 320 L100 250 L92 250 L94 240 L110 240 L134 128 L128 128 L130 120 L144 120Z"/></g>
+  <path d="M125 250 h56" stroke="${C.or}" stroke-width="3"/><path d="M0 320 h300 v40 H0Z" fill="#7A4A36"/>`,
+          },
+          usa: {
+            back: `<circle cx="150" cy="220" r="70" fill="${C.or}"/><g fill="#9A5E42">${[
+              [10, 180, 40],
+              [54, 150, 30],
+              [88, 200, 26],
+              [200, 170, 34],
+              [238, 140, 28],
+              [270, 190, 30],
+            ]
+              .map(
+                ([x, y, w]) =>
+                  `<rect x="${x}" y="${y}" width="${w}" height="${360 - y}"/>`,
+              )
+              .join("")}</g>`,
+            front: `<g fill="${C.nuit}"><rect x="0" y="230" width="46" height="130"/><rect x="40" y="200" width="36" height="160"/><rect x="118" y="120" width="44" height="240"/><path d="M128 120 L140 70 L152 120Z"/><rect x="138" y="44" width="4" height="30"/><rect x="170" y="180" width="40" height="180"/><rect x="214" y="216" width="48" height="144"/><rect x="258" y="250" width="42" height="110"/><rect x="80" y="240" width="34" height="120"/></g>
+  <g fill="${C.or}" opacity=".85">${Array.from({ length: 26 }, (_, i) => `<rect x="${[124, 132, 148, 176, 186, 196, 222, 236, 48, 58, 8, 22, 264, 280][i % 14]}" y="${150 + ((i * 53) % 180)}" width="4" height="5"/>`).join("")}</g>`,
+          },
+          maldives: {
+            back: `<circle cx="220" cy="120" r="40" fill="${C.creme}"/><path d="M0 220 h300 v140 H0Z" fill="#6FB3AE"/><path d="M0 236 h300" stroke="#BFE0DA" stroke-width="2" stroke-dasharray="12 18"/>`,
+            front: `<path d="M0 300 h300 v60 H0Z" fill="#4C938F"/>
+  ${[30, 110, 190].map((x) => `<g><rect x="${x + 8}" y="226" width="3" height="34" fill="${C.terre}"/><rect x="${x + 46}" y="226" width="3" height="34" fill="${C.terre}"/><path d="M${x} 232 L${x + 28} 196 L${x + 58} 232Z" fill="#8A5A3E"/><rect x="${x + 6}" y="230" width="46" height="18" fill="${C.sable}"/><rect x="${x + 22}" y="236" width="12" height="12" fill="${C.terre}"/></g>`).join("")}
+  <path d="M0 254 h300" stroke="${C.terre}" stroke-width="3"/>
+  <path d="M262 330 Q256 280 268 230" stroke="${C.terre}" stroke-width="6" fill="none"/><g fill="${C.terre}" transform="translate(268 230)"><path d="M0 0 Q-30 -10 -44 8 Q-22 -2 0 0Z"/><path d="M0 0 Q28 -14 40 4 Q18 -4 0 0Z"/><path d="M0 0 Q-6 -28 -26 -32 Q-6 -18 0 0Z"/></g>`,
+          },
+          dubai: {
+            back: `<circle cx="90" cy="150" r="50" fill="${C.creme}" opacity=".75"/><path d="M0 280 Q100 250 200 276 T300 262 V360 H0Z" fill="#D88A52"/>`,
+            front: `<g fill="${C.nuit}"><path d="M148 40 L152 40 L156 120 L162 120 L166 200 L174 200 L180 300 L120 300 L126 200 L134 200 L138 120 L144 120Z"/><rect x="40" y="200" width="30" height="110"/><rect x="74" y="230" width="24" height="80"/><rect x="200" y="210" width="28" height="100"/><path d="M234 300 V200 Q256 190 262 300Z"/><rect x="266" y="240" width="26" height="70"/></g>
+  <path d="M0 310 Q120 290 300 314 V360 H0Z" fill="${C.terre}"/>`,
+          },
+          turquie: {
+            back: `<circle cx="230" cy="110" r="36" fill="${C.creme}" opacity=".85"/>
+  ${[
+    [60, 90, 18, C.soleil],
+    [150, 70, 12, C.terre],
+    [200, 160, 14, "#C9622C"],
+  ]
+    .map(
+      ([x, y, r, c]) =>
+        `<g><path d="M${x - r} ${y} a${r} ${r} 0 1 1 ${2 * r} 0 q0 ${r * 0.7} -${r * 0.6} ${r * 1.2} h-${r * 0.8} q-${r * 0.6} -${r * 0.5} -${r * 0.6} -${r * 1.2}Z" fill="${c}"/><rect x="${x - r * 0.3}" y="${y + r * 1.35}" width="${r * 0.6}" height="${r * 0.5}" fill="${C.terre}"/></g>`,
+    )
+    .join("")}`,
+            front: `<g fill="${C.terre}"><path d="M60 300 V240 Q60 196 104 196 H112 Q156 196 156 240 V300Z"/><path d="M84 214 Q108 168 132 214Z"/><rect x="104" y="160" width="8" height="40"/><rect x="34" y="150" width="8" height="150"/><path d="M34 150 L38 126 L42 150Z"/><rect x="172" y="150" width="8" height="150"/><path d="M172 150 L176 126 L180 150Z"/><path d="M180 300 V260 Q180 230 214 230 Q248 230 248 260 V300Z"/></g>
+  <path d="M0 300 h300 v60 H0Z" fill="${C.nuit}"/>`,
+          },
+          japon: {
+            back: `<circle cx="210" cy="96" r="34" fill="${C.soleil}"/><path d="M0 260 L120 120 Q150 100 180 120 L300 260Z" fill="#C9A9A0"/><path d="M98 146 L120 120 Q150 100 180 120 L202 146 Q186 156 172 146 Q160 160 148 146 Q134 158 120 146 Q108 156 98 146Z" fill="${C.creme}"/>`,
+            front: `<path d="M0 270 h300 v90 H0Z" fill="#9C6A55"/>
+  <g fill="#B5431A"><path d="M40 196 Q150 180 260 196 L256 210 Q150 196 44 210Z"/><rect x="60" y="222" width="180" height="10"/><rect x="82" y="200" width="14" height="140"/><rect x="204" y="200" width="14" height="140"/><rect x="144" y="210" width="12" height="14"/></g>
+  <path d="M0 330 h300 v30 H0Z" fill="${C.terre}"/>`,
+          },
+          kenya: {
+            back: `<circle cx="150" cy="200" r="80" fill="${C.or}"/><path d="M0 270 h300 v90 H0Z" fill="#B66A3A"/>`,
+            front: `<g fill="${C.nuit}"><path d="M196 280 Q200 220 210 200" stroke="${C.nuit}" stroke-width="7" fill="none"/><path d="M150 196 Q210 170 270 196 Q240 206 210 200 Q180 206 150 196Z"/><path d="M168 184 Q210 160 254 184 Q210 178 168 184Z"/>
+  <path d="M60 300 L64 250 Q66 236 78 236 L100 236 L104 200 Q104 160 112 128 L116 124 Q126 120 124 130 L118 134 Q112 160 112 200 L114 238 Q118 250 116 300 L110 300 L108 262 L76 262 L72 300Z"/></g>
+  <path d="M0 300 Q150 284 300 300 V360 H0Z" fill="${C.terre}"/>`,
+          },
+        };
+
+        /* ---------------- BUILD DOM ---------------- */
+        // Departures board
+        const rows = document.getElementById("board-rows");
+        const STAT = [
+          "À L’HEURE",
+          "EMBARQUEMENT",
+          "À L’HEURE",
+          "PORTE OUVERTE",
+          "À L’HEURE",
+        ];
+        const flap = (s) =>
+          [...s]
+            .map(
+              (ch) => `<span class="flap">${ch === " " ? "&nbsp;" : ch}</span>`,
+            )
+            .join("");
+        DEST.slice(0, 5).forEach((d, i) => {
+          rows.insertAdjacentHTML(
+            "beforeend",
+            `<div class="board-row"><span>${flap(d.code)}</span><span class="truncate text-sable">${d.ville}</span><span class="text-[.7rem] tracking-wider ${i === 1 ? "text-[color:var(--or)]" : "text-sable/70"}">${STAT[i]}</span></div>`,
+          );
+        });
+        const clock = document.getElementById("clock");
+        const tickClock = () => {
+          const n = new Date();
+          clock.textContent = n.toLocaleTimeString("fr-FR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        };
+        tickClock();
+        setInterval(tickClock, 30000);
+        // Split-flap shuffle on codes
+        if (!reduced) {
+          const L = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+          document.querySelectorAll(".board-row .flap").forEach((f, i) => {
+            const fin = f.textContent;
+            let n = 0;
+            const it = setInterval(() => {
+              f.textContent = L[Math.floor(Math.random() * 26)];
+              if (++n > 10 + i) {
+                clearInterval(it);
+                f.textContent = fin;
+              }
+            }, 60);
+          });
+        }
+
+        // Ticker
+        const tk = DEST.map(
+          (d) =>
+            `<span class="px-6">${d.code} · ${d.ville.toUpperCase()}</span><span class="text-soleil">✦</span>`,
+        ).join("");
+        document.getElementById("ticker").innerHTML = tk + tk + tk + tk;
+
+        // Services
+        const track = document.getElementById("svc-track");
+        track.insertAdjacentHTML(
+          "beforeend",
+          SERVICES.map(
+            (s) => `
+  <article class="svc"><div class="svc-card">
+    <span class="tag">${s.code}</span>
+    <div class="svc-art" style="background:linear-gradient(180deg,${s.sky[0]},${s.sky[1]})">
+      <div class="sun" style="background:radial-gradient(circle,${C.creme} 0%,rgba(253,252,240,.0) 70%)"></div>
+      ${ART[s.art]}
+    </div>
+    <div class="svc-body">
+      <h3 class="text-[1.45rem] leading-tight text-terre">${s.t}</h3>
+      <p class="text-[.95rem] text-[color:var(--muted)]">${s.d}</p>
+      <a href="#contact" data-service="${s.t}" data-objet="${s.o}" class="svc-cta relative z-10 mt-1 text-sm font-medium text-soleil inline-flex items-center gap-1.5">Demander ce service <span aria-hidden="true">→</span></a>
+    </div>
+  </div></article>`,
+          ).join(""),
+        );
+
+        // Destinations
+        const grid = document.getElementById("dest-grid");
+        grid.innerHTML = DEST.map(
+          (d) => `
+  <article class="dest"><div class="dest-inner" style="background:linear-gradient(180deg,${d.sky[0]},${d.sky[1]})">
+    <div class="l" data-z="10"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].back}</svg></div>
+    <div class="l" data-z="40"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].front}</svg></div>
+    <div class="l photo" data-z="22"><img src="${d.photo}" alt="${d.ville}, ${d.pays}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><div class="tint"></div></div>
+    <div class="l" data-z="70" style="pointer-events:none">
+      <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
+        <span class="mono text-[.7rem] tracking-[.2em] px-2 py-1 rounded bg-creme text-terre">${d.code}</span>
+      </div>
+      <div class="cap">
+        <h3 class="text-2xl">${d.pays}</h3>
+        <p class="text-sm text-sable/90 mt-1">${d.txt}</p>
+        <div class="mt-3 flex flex-wrap gap-2"><span class="chip">MEILLEURE PÉRIODE</span><span class="chip">${d.saison.toUpperCase()}</span></div>
+      </div>
+    </div>
+  </div></article>`,
+        ).join("");
+
+        // Form options
+        const sel = document.getElementById("f-service");
+        SERVICES.forEach((s) =>
+          sel.insertAdjacentHTML("beforeend", `<option>${s.t}</option>`),
+        );
+        sel.insertAdjacentHTML("beforeend", "<option>Autre demande</option>");
+        document.getElementById("dest-list").innerHTML = DEST.map(
+          (d) => `<option value="${d.pays}">`,
+        ).join("");
+
+        /* In-page navigation handled in script (works inside pinned/3D sections and in the preview frame) */
+        const goTo = (id, after) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const y =
+            el.getBoundingClientRect().top +
+            scrollY -
+            (document.getElementById("nav").offsetHeight || 0);
+          window.scrollTo({
+            top: Math.max(0, y),
+            behavior: reduced ? "auto" : "smooth",
+          });
+          if (after) {
+            let last = -1,
+              n = 0;
+            const wait = () => {
+              if (Math.abs(scrollY - last) < 1 && ++n > 3) {
+                after();
+                return;
+              }
+              if (Math.abs(scrollY - last) >= 1) n = 0;
+              last = scrollY;
+              requestAnimationFrame(wait);
+            };
+            requestAnimationFrame(wait);
+          }
+        };
+        document.addEventListener("click", (e) => {
+          const a = e.target.closest('a[href^="#"]');
+          if (!a) return;
+          const id = a.getAttribute("href").slice(1);
+          if (!id) return;
+          e.preventDefault();
+          if (a.classList.contains("svc-cta")) {
+            const subj = document.getElementById("f-subject");
+            subj.value = a.dataset.objet;
+            sel.value = a.dataset.service;
+            setErr("f-subject", "");
+            setErr("f-service", "");
+            subj.classList.add("prefilled");
+            setTimeout(() => subj.classList.remove("prefilled"), 2200);
+            goTo("contact", () =>
+              document.getElementById("f-name").focus({ preventScroll: true }),
+            );
+          } else goTo(id);
+        });
+
+        /* ---------------- NAV ---------------- */
+        const nav = document.getElementById("nav");
+        const onNav = () => nav.classList.toggle("solid", scrollY > 40);
+        addEventListener("scroll", onNav, { passive: true });
+        onNav();
+
+        /* ---------------- THREE.JS : globe + clouds ---------------- */
+        const canvas = document.getElementById("gl");
+        const sky = document.getElementById("sky");
+        const boarding = document.getElementById("boarding");
+        let three = null;
+        if (window.THREE) {
+          const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true,
+          });
+          renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+          const scene = new THREE.Scene();
+          scene.fog = new THREE.Fog(0xfdfcf0, 12, 55);
+          const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+          camera.position.set(0, 0, 9);
+
+          const D = Math.PI / 180,
+            R = 2.4;
+          const ll = (lat, lon, r) => {
+            const p = (90 - lat) * D,
+              t = (lon + 180) * D;
+            return new THREE.Vector3(
+              -r * Math.sin(p) * Math.cos(t),
+              r * Math.cos(p),
+              r * Math.sin(p) * Math.sin(t),
+            );
+          };
+          const tex = (draw, s = 128) => {
+            const c = document.createElement("canvas");
+            c.width = c.height = s;
+            draw(c.getContext("2d"), s);
+            const t = new THREE.CanvasTexture(c);
+            return t;
+          };
+
+          const world = new THREE.Group();
+          scene.add(world);
+          const globe = new THREE.Group();
+          world.add(globe);
+          globe.rotation.y = 4.36;
+          globe.rotation.x = 0.28;
+
+          // core
+          globe.add(
+            new THREE.Mesh(
+              new THREE.SphereGeometry(R * 0.985, 64, 64),
+              new THREE.MeshBasicMaterial({ color: 0xf6e7d2 }),
+            ),
+          );
+          // dotted surface
+          const N = 2600,
+            pos = new Float32Array(N * 3),
+            col = new Float32Array(N * 3);
+          const cA = new THREE.Color(C.terre),
+            cB = new THREE.Color(C.soleil);
+          for (let i = 0; i < N; i++) {
+            const y = 1 - (i / (N - 1)) * 2,
+              r = Math.sqrt(1 - y * y),
+              th = i * 2.39996;
+            pos.set([Math.cos(th) * r * R, y * R, Math.sin(th) * r * R], i * 3);
+            const m = (Math.sin(i * 0.37) + Math.sin(i * 0.051)) * 0.25 + 0.5;
+            const c = cA.clone().lerp(cB, m);
+            col.set([c.r, c.g, c.b], i * 3);
+          }
+          const pg = new THREE.BufferGeometry();
+          pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+          pg.setAttribute("color", new THREE.BufferAttribute(col, 3));
+          const dot = tex((g, s) => {
+            g.beginPath();
+            g.arc(s / 2, s / 2, s / 2 - 2, 0, 7);
+            g.fillStyle = "#fff";
+            g.fill();
+          }, 32);
+          globe.add(
+            new THREE.Points(
+              pg,
+              new THREE.PointsMaterial({
+                size: 0.045,
+                vertexColors: true,
+                map: dot,
+                transparent: true,
+                alphaTest: 0.4,
+              }),
+            ),
+          );
+          // graticule
+          const gm = new THREE.LineBasicMaterial({
+            color: 0xe37b3c,
+            transparent: true,
+            opacity: 0.22,
+          });
+          for (let lat = -60; lat <= 60; lat += 30) {
+            const pts = [];
+            for (let lo = 0; lo <= 360; lo += 6)
+              pts.push(ll(lat, lo, R * 1.002));
+            globe.add(
+              new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gm),
+            );
+          }
+          for (let lo = 0; lo < 180; lo += 30) {
+            const pts = [];
+            for (let la = -90; la <= 270; la += 6)
+              pts.push(
+                ll(la > 90 ? 180 - la : la, la > 90 ? lo + 180 : lo, R * 1.002),
+              );
+            globe.add(
+              new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gm),
+            );
+          }
+
+          // markers + labels
+          const P = {};
+          DEST.forEach((d) => (P[d.code] = ll(d.lat, d.lon, R)));
+          const pulses = [];
+          DEST.forEach((d) => {
+            const m = new THREE.Mesh(
+              new THREE.SphereGeometry(0.05, 16, 16),
+              new THREE.MeshBasicMaterial({ color: 0xe37b3c }),
+            );
+            m.position.copy(P[d.code]);
+            globe.add(m);
+            const ring = new THREE.Mesh(
+              new THREE.RingGeometry(0.07, 0.095, 32),
+              new THREE.MeshBasicMaterial({
+                color: 0xe37b3c,
+                transparent: true,
+                side: THREE.DoubleSide,
+              }),
+            );
+            ring.position.copy(P[d.code].clone().multiplyScalar(1.004));
+            ring.lookAt(P[d.code].clone().multiplyScalar(2));
+            globe.add(ring);
+            pulses.push(ring);
+            const lt = tex((g, s) => {
+              g.clearRect(0, 0, s, s / 2);
+              g.fillStyle = "rgba(58,39,29,.92)";
+              const w = s * 0.8,
+                h = s * 0.3,
+                x = (s - w) / 2,
+                y = s * 0.1;
+              g.beginPath();
+              g.roundRect ? g.roundRect(x, y, w, h, 10) : g.rect(x, y, w, h);
+              g.fill();
+              g.fillStyle = "#F1A55B";
+              g.font = '500 30px "DM Mono", monospace';
+              g.textAlign = "center";
+              g.textBaseline = "middle";
+              g.fillText(d.code, s / 2, y + h / 2 + 1);
+            }, 128);
+            const sp = new THREE.Sprite(
+              new THREE.SpriteMaterial({
+                map: lt,
+                transparent: true,
+                depthWrite: false,
+              }),
+            );
+            sp.scale.set(0.55, 0.55, 1);
+            sp.position.copy(P[d.code].clone().multiplyScalar(1.12));
+            globe.add(sp);
+          });
+
+          // flight arcs
+          const ROUTES = [
+            ["CDG", "JFK"],
+            ["CDG", "RAK"],
+            ["CDG", "IST"],
+            ["IST", "DXB"],
+            ["DXB", "MLE"],
+            ["DXB", "HND"],
+            ["NBO", "DXB"],
+            ["RAK", "JFK"],
+            ["NBO", "CDG"],
+          ];
+          const arcs = ROUTES.map(([a, b], i) => {
+            const A = P[a],
+              B = P[b],
+              dist = A.distanceTo(B);
+            const mid = A.clone()
+              .add(B)
+              .multiplyScalar(0.5)
+              .normalize()
+              .multiplyScalar(R + dist * 0.38);
+            const curve = new THREE.QuadraticBezierCurve3(A, mid, B);
+            const g = new THREE.BufferGeometry().setFromPoints(
+              curve.getPoints(80),
+            );
+            const line = new THREE.Line(
+              g,
+              new THREE.LineBasicMaterial({
+                color: i % 2 ? 0x5b3e2f : 0xe37b3c,
+                transparent: true,
+                opacity: 0.85,
+              }),
+            );
+            g.setDrawRange(0, 0);
+            globe.add(line);
+            return { curve, g, off: i * 0.11 };
+          });
+
+          // airplane
+          const planeG = new THREE.Group();
+          const pm = new THREE.MeshBasicMaterial({ color: 0x5b3e2f });
+          const body = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.025, 0.04, 0.32, 10),
+            pm,
+          );
+          body.rotation.x = Math.PI / 2;
+          planeG.add(body);
+          const wing = new THREE.Mesh(
+            new THREE.BoxGeometry(0.34, 0.012, 0.08),
+            pm,
+          );
+          wing.position.z = 0.02;
+          planeG.add(wing);
+          const tail = new THREE.Mesh(
+            new THREE.BoxGeometry(0.13, 0.01, 0.05),
+            pm,
+          );
+          tail.position.z = -0.13;
+          planeG.add(tail);
+          const fin = new THREE.Mesh(
+            new THREE.BoxGeometry(0.01, 0.07, 0.05),
+            pm,
+          );
+          fin.position.set(0, 0.035, -0.13);
+          planeG.add(fin);
+          globe.add(planeG);
+
+          // glow + sun
+          const glowT = tex((g, s) => {
+            const gr = g.createRadialGradient(
+              s / 2,
+              s / 2,
+              s * 0.18,
+              s / 2,
+              s / 2,
+              s / 2,
+            );
+            gr.addColorStop(0, "rgba(241,165,91,.55)");
+            gr.addColorStop(0.5, "rgba(227,123,60,.18)");
+            gr.addColorStop(1, "rgba(227,123,60,0)");
+            g.fillStyle = gr;
+            g.fillRect(0, 0, s, s);
+          }, 256);
+          const glow = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: glowT,
+              transparent: true,
+              depthWrite: false,
+              fog: false,
+            }),
+          );
+          glow.scale.set(R * 3.6, R * 3.6, 1);
+          glow.position.z = -0.5;
+          world.add(glow);
+          const sunT = tex((g, s) => {
+            const gr = g.createRadialGradient(
+              s / 2,
+              s / 2,
+              0,
+              s / 2,
+              s / 2,
+              s / 2,
+            );
+            gr.addColorStop(0, "rgba(253,240,214,1)");
+            gr.addColorStop(0.25, "rgba(241,165,91,.95)");
+            gr.addColorStop(0.5, "rgba(227,123,60,.35)");
+            gr.addColorStop(1, "rgba(227,123,60,0)");
+            g.fillStyle = gr;
+            g.fillRect(0, 0, s, s);
+          }, 256);
+          const sun = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: sunT,
+              transparent: true,
+              depthWrite: false,
+              fog: false,
+            }),
+          );
+          sun.scale.set(16, 16, 1);
+          sun.position.set(6, 4, -40);
+          scene.add(sun);
+
+          // clouds
+          const cloudT = tex((g, s) => {
+            for (let i = 0; i < 14; i++) {
+              const x = s * (0.2 + Math.random() * 0.6),
+                y = s * (0.35 + Math.random() * 0.3),
+                r = s * (0.12 + Math.random() * 0.16);
+              const gr = g.createRadialGradient(x, y, 0, x, y, r);
+              gr.addColorStop(0, "rgba(255,253,245,.75)");
+              gr.addColorStop(1, "rgba(255,253,245,0)");
+              g.fillStyle = gr;
+              g.fillRect(0, 0, s, s);
+            }
+          }, 256);
+          const clouds = new THREE.Group();
+          scene.add(clouds);
+          for (let i = 0; i < 150; i++) {
+            const m = new THREE.SpriteMaterial({
+              map: cloudT,
+              transparent: true,
+              depthWrite: false,
+              opacity: 0.55 + Math.random() * 0.4,
+              color: new THREE.Color().setHSL(
+                0.07,
+                0.6,
+                0.93 + Math.random() * 0.06,
+              ),
+            });
+            const s = new THREE.Sprite(m);
+            const sc = 5 + Math.random() * 9;
+            s.scale.set(sc, sc * 0.55, 1);
+            const side = Math.random() < 0.5 ? -1 : 1;
+            s.position.set(
+              side * (1.5 + Math.random() * 10),
+              (Math.random() - 0.55) * 7,
+              -8 - Math.random() * 70,
+            );
+            s.userData.v = 0.2 + Math.random() * 0.5;
+            clouds.add(s);
+          }
+          // birds of light (particles drifting)
+          const dustN = 400,
+            dp = new Float32Array(dustN * 3);
+          for (let i = 0; i < dustN; i++) {
+            dp.set(
+              [
+                (Math.random() - 0.5) * 30,
+                (Math.random() - 0.5) * 16,
+                -Math.random() * 80 + 6,
+              ],
+              i * 3,
+            );
+          }
+          const dg = new THREE.BufferGeometry();
+          dg.setAttribute("position", new THREE.BufferAttribute(dp, 3));
+          scene.add(
+            new THREE.Points(
+              dg,
+              new THREE.PointsMaterial({
+                color: 0xe37b3c,
+                size: 0.06,
+                map: dot,
+                transparent: true,
+                alphaTest: 0.4,
+                opacity: 0.7,
+              }),
+            ),
+          );
+
+          three = {
+            renderer,
+            scene,
+            camera,
+            world,
+            globe,
+            glow,
+            arcs,
+            planeG,
+            pulses,
+            clouds,
+            sun,
+          };
+        }
+
+        /* ---------------- SKY + SCROLL STATE ---------------- */
+        const lerp = (a, b, t) => a + (b - a) * t,
+          clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)),
+          ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+        const STOPS = [
+          [0, "#FDFCF0"],
+          [0.45, "#F9E2C6"],
+          [0.8, "#F3B884"],
+          [1, "#E9955C"],
+        ];
+        const hex2 = (h) =>
+          [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+        const skyAt = (t) => {
+          for (let i = 1; i < STOPS.length; i++) {
+            if (t <= STOPS[i][0]) {
+              const [a, ca] = STOPS[i - 1],
+                [b, cb] = STOPS[i];
+              const k = (t - a) / (b - a);
+              const A = hex2(ca),
+                B = hex2(cb);
+              return A.map((v, j) => Math.round(lerp(v, B[j], k)));
+            }
+          }
+          return hex2(STOPS[STOPS.length - 1][1]);
+        };
+
+        let journey = 0,
+          mx = 0,
+          my = 0;
+        const pass = document.getElementById("pass"),
+          bTitle = document.getElementById("b-title");
+        function measure() {
+          const top = boarding.offsetTop,
+            h = boarding.offsetHeight;
+          const end = top + h - innerHeight;
+          journey = clamp(scrollY / Math.max(1, end));
+          const bp = clamp((scrollY - top) / Math.max(1, h - innerHeight));
+          const rgb = skyAt(journey);
+          sky.style.background = `rgb(${rgb.join(",")})`;
+          if (three)
+            three.scene.fog.color.setRGB(
+              rgb[0] / 255,
+              rgb[1] / 255,
+              rgb[2] / 255,
+            );
+          if (!reduced) {
+            const f = ease(clamp((bp - 0.05) / 0.5));
+            pass.style.transform = `rotateX(${lerp(72, 0, f)}deg) translateY(${lerp(120, 0, f)}px) scale(${lerp(0.8, 1, f)})`;
+            pass.style.opacity = lerp(0.25, 1, f);
+            const out = clamp((bp - 0.82) / 0.18);
+            bTitle.style.transform = `translateZ(0) scale(${lerp(1, 1.15, out)})`;
+            bTitle.parentElement.style.opacity = 1 - out * 0.85;
+          }
+          canvas.style.opacity =
+            scrollY > boarding.offsetTop + boarding.offsetHeight ? 0 : 1;
+        }
+        addEventListener("scroll", measure, { passive: true });
+        addEventListener(
+          "pointermove",
+          (e) => {
+            mx = e.clientX / innerWidth - 0.5;
+            my = e.clientY / innerHeight - 0.5;
+          },
+          { passive: true },
+        );
+
+        function resize() {
+          if (!three) return;
+          const w = innerWidth,
+            h = innerHeight;
+          three.renderer.setSize(w, h, false);
+          three.camera.aspect = w / h;
+          three.camera.updateProjectionMatrix();
+        }
+        addEventListener("resize", () => {
+          resize();
+          measure();
+        });
+
+        const clockT = three ? new THREE.Clock() : null;
+        function loop() {
+          requestAnimationFrame(loop);
+          if (!three) return;
+          if (canvas.style.opacity === "0") return;
+          const t = clockT.getElapsedTime();
+          const {
+            camera,
+            world,
+            globe,
+            arcs,
+            planeG,
+            pulses,
+            clouds,
+            renderer,
+            scene,
+          } = three;
+          const mobile = innerWidth < 768;
+          const j = ease(journey);
+          // globe position: right side in hero, slides away during take-off
+          const baseX = mobile ? 0 : 2.2,
+            baseY = mobile ? 0.9 : 0.1,
+            baseS = mobile ? 0.78 : 1;
+          world.position.set(
+            lerp(baseX, mobile ? -7 : -9, j),
+            lerp(baseY, 2.5, j),
+            lerp(0, 2, j),
+          );
+          world.scale.setScalar(baseS * lerp(1, 0.7, j));
+          globe.rotation.y += reduced ? 0 : 0.0016;
+          // camera flies forward through the clouds
+          camera.position.z = lerp(9, -52, j);
+          camera.position.x += (mx * 0.8 - camera.position.x) * 0.04;
+          camera.position.y +=
+            (-my * 0.5 + lerp(0, -0.5, j) - camera.position.y) * 0.04;
+          camera.lookAt(
+            camera.position.x * 0.3,
+            camera.position.y * 0.3,
+            camera.position.z - 10,
+          );
+          camera.rotation.z = lerp(0, -0.06, Math.sin(j * Math.PI));
+          // arcs draw in loop
+          arcs.forEach((a) => {
+            const k = (t * 0.18 + a.off) % 1.4;
+            const n = Math.floor(clamp(k) * 81);
+            const s = k > 1 ? Math.floor(((k - 1) / 0.4) * 81) : 0;
+            a.g.setDrawRange(s, Math.max(0, n - s));
+          });
+          // plane following the active arc
+          const leg = Math.floor(t / 5) % arcs.length,
+            lt = (t % 5) / 5,
+            cur = arcs[leg].curve;
+          planeG.position.copy(cur.getPoint(lt));
+          planeG.lookAt(cur.getPoint(Math.min(1, lt + 0.01)));
+          pulses.forEach((p, i) => {
+            const k = (t * 0.6 + i * 0.13) % 1;
+            p.scale.setScalar(1 + k * 1.6);
+            p.material.opacity = 1 - k;
+          });
+          clouds.children.forEach((c) => {
+            c.position.x += Math.sign(c.position.x) * 0.0015 * c.userData.v;
+          });
+          renderer.render(scene, camera);
+        }
+        resize();
+        measure();
+        loop();
+
+        /* ---------------- GSAP ---------------- */
+        if (window.gsap && window.ScrollTrigger) {
+          gsap.registerPlugin(ScrollTrigger);
+          if (!reduced) {
+            gsap.from(".hero-in", {
+              y: 30,
+              opacity: 0.15,
+              duration: 1.1,
+              ease: "power3.out",
+              stagger: 0.12,
+            });
+
+            // Horizontal services corridor
+            const svc = document.getElementById("services");
+            const cards = [...document.querySelectorAll(".svc")];
+            const done = document.getElementById("route-done"),
+              rplane = document.getElementById("route-plane");
+            const dist = () => Math.max(0, track.scrollWidth - innerWidth);
+            const depth3D = () => {
+              const vw = innerWidth,
+                cx = vw / 2;
+              cards.forEach((c) => {
+                const r = c.getBoundingClientRect();
+                const d = (r.left + r.width / 2 - cx) / vw;
+                const ad = Math.min(1.2, Math.abs(d));
+                c.style.transform = `translateZ(${-ad * 260}px) rotateY(${clamp(-d * 42, -50, 50)}deg) rotateZ(${d * -2}deg)`;
+                c.style.opacity = String(clamp(1.25 - ad * 0.7, 0.35, 1));
+                c.style.zIndex = String(100 - Math.round(ad * 50));
+              });
+            };
+            gsap.to(track, {
+              x: () => -dist(),
+              ease: "none",
+              scrollTrigger: {
+                trigger: svc,
+                pin: "#svc-pin",
+                start: "top top",
+                end: () => "+=" + dist(),
+                scrub: 0.8,
+                invalidateOnRefresh: true,
+                onUpdate: (self) => {
+                  const p = self.progress;
+                  svc.style.setProperty("--p", p.toFixed(3));
+                  done.style.width = p * 100 + "%";
+                  rplane.style.left = p * 100 + "%";
+                },
+              },
+            });
+            gsap.ticker.add(depth3D);
+            depth3D();
+
+            // Destinations: cards fold up into place
+            gsap.utils.toArray(".dest").forEach((el, i) => {
+              gsap.from(el, {
+                rotateX: 28,
+                y: 80,
+                z: -120,
+                opacity: 0.3,
+                duration: 1,
+                ease: "power3.out",
+                delay: (i % 4) * 0.08,
+                scrollTrigger: {
+                  trigger: el,
+                  start: "top 92%",
+                  toggleActions: "play none none reverse",
+                },
+              });
+            });
+            // generic reveals (start visible-ish, never fully hidden)
+            gsap.utils.toArray(".reveal").forEach((el) => {
+              gsap.from(el, {
+                y: 40,
+                opacity: 0.25,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: { trigger: el, start: "top 90%" },
+              });
+            });
+            const sl = document.getElementById("step-line");
+            if (sl)
+              gsap.fromTo(
+                sl,
+                { scaleX: 0 },
+                {
+                  scaleX: 1,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: "#etapes",
+                    start: "top 70%",
+                    end: "center 50%",
+                    scrub: true,
+                  },
+                },
+              );
+          }
+        }
+
+        /* Destination 3D tilt with layered parallax */
+        if (!reduced)
+          document.querySelectorAll(".dest").forEach((el) => {
+            const inner = el.querySelector(".dest-inner"),
+              layers = [...el.querySelectorAll(".l")];
+            el.addEventListener("pointermove", (e) => {
+              const r = el.getBoundingClientRect();
+              const x = (e.clientX - r.left) / r.width - 0.5,
+                y = (e.clientY - r.top) / r.height - 0.5;
+              inner.style.transform = `rotateY(${x * 18}deg) rotateX(${-y * 14}deg) scale(1.03)`;
+              layers.forEach((l) => {
+                const z = +l.dataset.z;
+                l.style.transform = `translate3d(${-x * z * 0.35}px,${-y * z * 0.3}px,${z}px)`;
+              });
+            });
+            el.addEventListener("pointerleave", () => {
+              inner.style.transform = "";
+              layers.forEach((l) => (l.style.transform = ""));
+            });
+          });
+
+        /* ---------------- CONTACT FORM ---------------- */
+        const form = document.getElementById("form"),
+          status = document.getElementById("f-status"),
+          btn = document.getElementById("f-submit");
+        const copyText = async (txt, button, done = "Copié") => {
+          try {
+            await navigator.clipboard.writeText(txt);
+            const o = button.textContent;
+            button.textContent = done;
+            setTimeout(() => (button.textContent = o), 1800);
+          } catch (e) {
+            const r = document.createRange();
+            const n = document.getElementById(
+              button.dataset.target || "mail-addr",
+            );
+            if (n) {
+              r.selectNodeContents(n);
+              const s = getSelection();
+              s.removeAllRanges();
+              s.addRange(r);
+            }
+          }
+        };
+        document
+          .getElementById("copy-mail")
+          .addEventListener("click", (e) =>
+            copyText(MAIL, e.currentTarget, "Adresse copiée"),
+          );
+
+        const setErr = (id, msg) => {
+          const s = form.querySelector(`.err[data-for="${id}"]`);
+          if (s) s.textContent = msg || "";
+        };
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const v = (id) => document.getElementById(id).value.trim();
+          let ok = true;
+          setErr(
+            "f-name",
+            v("f-name") ? "" : ((ok = false), "Indiquez votre nom."),
+          );
+          setErr(
+            "f-email",
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("f-email"))
+              ? ""
+              : ((ok = false),
+                "Saisissez une adresse e-mail valide, par exemple vous@exemple.com."),
+          );
+          setErr(
+            "f-subject",
+            v("f-subject")
+              ? ""
+              : ((ok = false), "Indiquez l’objet de votre demande."),
+          );
+          setErr(
+            "f-service",
+            v("f-service")
+              ? ""
+              : ((ok = false), "Choisissez le service qui vous intéresse."),
+          );
+          setErr(
+            "f-msg",
+            v("f-msg").length >= 10
+              ? ""
+              : ((ok = false),
+                "Décrivez votre projet en quelques mots (10 caractères minimum)."),
+          );
+          if (!ok) {
+            form
+              .querySelector(".err:not(:empty)")
+              ?.previousElementSibling?.focus();
+            return;
+          }
+
+          const data = Object.fromEntries(new FormData(form));
+          data._subject = `${data.objet} · Demande Travel Studio`;
+          btn.disabled = true;
+          btn.style.opacity = 0.7;
+          btn.firstChild.textContent = "Envoi en cours… ";
+          status.hidden = true;
+          try {
+            // FormSubmit relaie le formulaire vers direction@travelstudio.com (activation à confirmer une fois par e-mail)
+            const res = await fetch("https://formsubmit.co/ajax/" + MAIL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || json.success === "false" || json.success === false)
+              throw new Error("refused");
+            status.innerHTML = `<div class="rounded-xl p-4 bg-[#EAF3E6] text-[#2F5A2A]"><strong>Demande envoyée.</strong> Merci ${data.nom.split(" ")[0]}, un conseiller Travel Studio vous répondra à ${data.email}.</div>`;
+            form.reset();
+          } catch (err) {
+            const recap = `À : ${MAIL}\nObjet : ${data.objet}\n\nNom : ${data.nom}\nE-mail : ${data.email}\nTéléphone : ${data.telephone || "-"}\nService : ${data.service}\nDestination : ${data.destination || "-"}\nDépart : ${data.date_depart || "-"}\nVoyageurs : ${data.voyageurs || "-"}\n\n${data.message}`;
+            status.innerHTML = `<div class="rounded-xl p-4 bg-sable text-terre">
+      <strong>Votre demande n'a pas pu être transmise en ligne.</strong> Rien n'a été envoyé. Copiez le récapitulatif ci-dessous et envoyez-le par e-mail à <span class="mono select-all">${MAIL}</span>.
+      <pre id="recap" class="mt-3 p-3 rounded-lg bg-creme text-xs whitespace-pre-wrap overflow-x-auto mono"></pre>
+      <button type="button" id="copy-recap" data-target="recap" class="mt-3 btn btn-sun !py-2 !px-4 text-sm">Copier le récapitulatif</button></div>`;
+            document.getElementById("recap").textContent = recap;
+            document
+              .getElementById("copy-recap")
+              .addEventListener("click", (ev) =>
+                copyText(recap, ev.currentTarget, "Récapitulatif copié"),
+              );
+          } finally {
+            status.hidden = false;
+            btn.disabled = false;
+            btn.style.opacity = 1;
+            btn.firstChild.textContent = "Envoyer ma demande ";
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
