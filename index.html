@@ -17,6 +17,15 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
     />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ts-theme");
+          if (t === "dark" || t === "light")
+            document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script>
       tailwind.config = {
@@ -29,6 +38,10 @@
               sable: "#F2DCC2",
               nuit: "#3A271D",
               peche: "#F6C9A0",
+              surface: "rgb(var(--surface-rgb) / <alpha-value>)",
+              heading: "rgb(var(--heading-rgb) / <alpha-value>)",
+              ink: "rgb(var(--ink-rgb) / <alpha-value>)",
+              band: "rgb(var(--band-rgb) / <alpha-value>)",
             },
             fontFamily: {
               display: ["Marcellus", "Georgia", "Times New Roman", "serif"],
@@ -66,19 +79,81 @@
         --peche: #f6c9a0;
         --nuit: #3a271d;
         --or: #f1a55b;
+        /* semantic tokens — light (jour) */
+        --bg: #fdfcf0;
+        --bg-2: #f2dcc2;
+        --surface: #fdfcf0;
+        --surface-rgb: 253 252 240;
+        --field: #ffffff;
+        --heading: #5b3e2f;
+        --heading-rgb: 91 62 47;
         --ink: #3a271d;
+        --ink-rgb: 58 39 29;
         --muted: #7a5f50;
+        --line: rgba(91, 62, 47, 0.18);
+        --nav-bg: rgba(253, 252, 240, 0.86);
+        --band-rgb: 91 62 47;
+        --foot: #3a271d;
+        --board: #3a271d;
+        --flap: #4a3427;
+        --shadow: rgba(58, 39, 29, 0.55);
         --f-display: "Marcellus", Georgia, "Times New Roman", serif;
         --f-body: "Jost", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
         --f-mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
         color-scheme: light;
       }
+      /* nuit : la même charte, inversée — terre profonde en fond, sable pour les titres, l'orange soleil reste l'accent */
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #1c130e;
+          --bg-2: #2a1b13;
+          --surface: #2b1e17;
+          --surface-rgb: 43 30 23;
+          --field: #22170f;
+          --heading: #f2dcc2;
+          --heading-rgb: 242 220 194;
+          --ink: #efe3d2;
+          --ink-rgb: 239 227 210;
+          --muted: #bfa48f;
+          --line: rgba(242, 220, 194, 0.16);
+          --nav-bg: rgba(28, 19, 14, 0.82);
+          --band-rgb: 43 30 23;
+          --foot: #120c09;
+          --board: #120c09;
+          --flap: #2b1e17;
+          --shadow: rgba(0, 0, 0, 0.7);
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #1c130e;
+        --bg-2: #2a1b13;
+        --surface: #2b1e17;
+        --surface-rgb: 43 30 23;
+        --field: #22170f;
+        --heading: #f2dcc2;
+        --heading-rgb: 242 220 194;
+        --ink: #efe3d2;
+        --ink-rgb: 239 227 210;
+        --muted: #bfa48f;
+        --line: rgba(242, 220, 194, 0.16);
+        --nav-bg: rgba(28, 19, 14, 0.82);
+        --band-rgb: 43 30 23;
+        --foot: #120c09;
+        --board: #120c09;
+        --flap: #2b1e17;
+        --shadow: rgba(0, 0, 0, 0.7);
+        color-scheme: dark;
+      }
       html {
         scroll-behavior: auto;
       }
       body {
-        background: var(--creme);
+        background: var(--bg);
         color: var(--ink);
+        transition:
+          background-color 0.5s,
+          color 0.5s;
         font-family: var(--f-body);
         font-size: 16px;
         line-height: 1.6;
@@ -90,7 +165,7 @@
         inset: 0 0 auto;
         height: env(safe-area-inset-top, 0px);
         z-index: 60;
-        background: var(--creme);
+        background: var(--bg);
       }
       h1,
       h2,
@@ -124,7 +199,7 @@
         position: fixed;
         inset: 0;
         z-index: -2;
-        background: var(--creme);
+        background: var(--bg);
         transition: background 0.2s linear;
       }
       #gl {
@@ -148,15 +223,15 @@
           box-shadow 0.4s;
       }
       #nav.solid {
-        background: rgba(253, 252, 240, 0.86);
+        background: var(--nav-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 1px 0 rgba(91, 62, 47, 0.12);
+        box-shadow: 0 1px 0 var(--line);
       }
       .navlink {
         position: relative;
         font-size: 0.92rem;
-        color: var(--terre);
+        color: var(--heading);
       }
       .navlink::after {
         content: "";
@@ -203,18 +278,18 @@
         transform: translateY(-2px);
       }
       .btn-ghost {
-        color: var(--terre);
-        border: 1.5px solid rgba(91, 62, 47, 0.35);
+        color: var(--heading);
+        border: 1.5px solid var(--line);
       }
       .btn-ghost:hover {
-        border-color: var(--terre);
+        border-color: var(--heading);
         transform: translateY(-2px);
       }
 
       .grad-text {
         background: linear-gradient(
           100deg,
-          var(--terre) 10%,
+          var(--heading) 10%,
           var(--soleil) 55%,
           var(--or) 80%
         );
@@ -225,7 +300,8 @@
 
       /* Departures board */
       .board {
-        background: var(--nuit);
+        background: var(--board);
+        border: 1px solid var(--line);
         color: var(--sable);
         border-radius: 14px;
         box-shadow: 0 30px 60px -30px rgba(58, 39, 29, 0.8);
@@ -234,7 +310,7 @@
         display: inline-block;
         min-width: 1.05em;
         text-align: center;
-        background: #4a3427;
+        background: var(--flap);
         border-radius: 3px;
         margin-right: 2px;
         padding: 0 0.08em;
@@ -284,16 +360,17 @@
       }
       .pass {
         transform-style: preserve-3d;
-        background: var(--creme);
+        background: var(--surface);
+        color: var(--ink);
         border-radius: 18px;
-        box-shadow: 0 40px 80px -30px rgba(58, 39, 29, 0.55);
+        box-shadow: 0 40px 80px -30px var(--shadow);
         display: grid;
         grid-template-columns: 1fr auto;
         overflow: hidden;
         max-width: 100%;
       }
       .pass .stub {
-        border-left: 2px dashed rgba(91, 62, 47, 0.3);
+        border-left: 2px dashed var(--line);
         background: linear-gradient(160deg, var(--soleil), var(--or));
         color: var(--creme);
       }
@@ -301,11 +378,11 @@
         height: 44px;
         background: repeating-linear-gradient(
           90deg,
-          var(--terre) 0 2px,
+          var(--heading) 0 2px,
           transparent 2px 4px,
-          var(--terre) 4px 5px,
+          var(--heading) 4px 5px,
           transparent 5px 8px,
-          var(--terre) 8px 11px,
+          var(--heading) 8px 11px,
           transparent 11px 12px
         );
       }
@@ -326,7 +403,11 @@
             rgba(241, 165, 91, 0.28),
             transparent 70%
           ),
-          linear-gradient(180deg, var(--nuit), var(--terre));
+          linear-gradient(
+            180deg,
+            var(--svc-a, var(--nuit)),
+            var(--svc-b, var(--terre))
+          );
       }
       #svc-pin {
         height: 100vh;
@@ -364,7 +445,7 @@
         position: relative;
         height: min(62vh, 520px);
         border-radius: 22px;
-        background: var(--creme);
+        background: var(--surface);
         color: var(--ink);
         overflow: hidden;
         display: flex;
@@ -411,8 +492,8 @@
         font-family: var(--f-mono);
         font-size: 0.72rem;
         letter-spacing: 0.16em;
-        background: var(--creme);
-        color: var(--terre);
+        background: var(--surface);
+        color: var(--heading);
         padding: 0.3rem 0.65rem;
         border-radius: 6px;
         box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.4);
@@ -423,7 +504,7 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        border: 1.5px solid var(--terre);
+        border: 1.5px solid var(--heading);
         margin-right: 0.45rem;
         vertical-align: 1px;
       }
@@ -542,6 +623,64 @@
       }
 
       /* Steps */
+      :root[data-theme="dark"] #services {
+        --svc-a: #120c09;
+        --svc-b: #3a2419;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) #services {
+          --svc-a: #120c09;
+          --svc-b: #3a2419;
+        }
+      }
+      .svc-art {
+        transition: filter 0.5s;
+      }
+      :root[data-theme="dark"] .svc-art {
+        filter: saturate(0.95) brightness(0.9);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .svc-art {
+          filter: saturate(0.95) brightness(0.9);
+        }
+      }
+      .theme-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--heading);
+        border: 1.5px solid var(--line);
+        background: transparent;
+        transition:
+          transform 0.4s,
+          border-color 0.3s,
+          background 0.3s;
+        flex: 0 0 auto;
+      }
+      .theme-btn:hover {
+        border-color: var(--soleil);
+        transform: rotate(20deg);
+      }
+      .theme-btn .moon {
+        display: none;
+      }
+      :root[data-theme="dark"] .theme-btn .moon {
+        display: block;
+      }
+      :root[data-theme="dark"] .theme-btn .sunico {
+        display: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .theme-btn .moon {
+          display: block;
+        }
+        :root:not([data-theme="light"]) .theme-btn .sunico {
+          display: none;
+        }
+      }
       .step-line {
         background: linear-gradient(
           90deg,
@@ -561,6 +700,26 @@
           var(--nuit)
         );
       }
+      :root[data-theme="dark"] #contact {
+        background: linear-gradient(
+          160deg,
+          #b8582a 0%,
+          #7a3a1e 35%,
+          #3a2419 70%,
+          #120c09
+        );
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) #contact {
+          background: linear-gradient(
+            160deg,
+            #b8582a 0%,
+            #7a3a1e 35%,
+            #3a2419 70%,
+            #120c09
+          );
+        }
+      }
       .field {
         display: flex;
         flex-direction: column;
@@ -577,8 +736,8 @@
       .field input,
       .field select,
       .field textarea {
-        background: #fff;
-        border: 1.5px solid rgba(91, 62, 47, 0.18);
+        background: var(--field);
+        border: 1.5px solid var(--line);
         border-radius: 12px;
         padding: 0.8rem 0.95rem;
         color: var(--ink);
@@ -664,18 +823,18 @@
             <path d="M24 50 A26 26 0 0 1 76 50 Z" fill="url(#lg-sun)" />
             <path
               d="M12 56 Q44 38 90 50 Q62 52 42 68 Q24 66 12 56Z"
-              fill="#5B3E2F"
+              style="fill: var(--heading)"
             />
             <path
               d="M18 54 Q48 42 84 48"
-              stroke="#F2DCC2"
+              style="stroke: var(--bg)"
               stroke-width="2.6"
               fill="none"
               stroke-linecap="round"
             />
             <g
               transform="translate(70 30) rotate(58) scale(.62)"
-              fill="#5B3E2F"
+              style="fill: var(--heading)"
             >
               <path
                 d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
@@ -683,7 +842,7 @@
             </g>
           </svg>
           <span class="leading-none">
-            <span class="block font-display text-terre text-xl tracking-wide"
+            <span class="block font-display text-heading text-xl tracking-wide"
               >TRAVEL STUDIO</span
             >
             <span
@@ -702,10 +861,86 @@
           <a class="btn btn-sun !py-2.5 !px-5 text-sm" href="#contact"
             >Préparer mon voyage</a
           >
+          <button
+            type="button"
+            class="theme-btn"
+            data-theme-toggle
+            aria-label="Basculer entre le mode jour et le mode nuit"
+            title="Mode jour / nuit"
+          >
+            <svg
+              class="sunico"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4.2" fill="#E37B3C" stroke="none" />
+              <path
+                d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
+              />
+            </svg>
+            <svg
+              class="moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+                fill="#F2DCC2"
+              />
+              <circle cx="17.5" cy="5.5" r="1" fill="#E37B3C" />
+            </svg>
+          </button>
         </nav>
-        <a class="md:hidden btn btn-sun !py-2 !px-4 text-sm" href="#contact"
-          >Contact</a
-        >
+        <div class="md:hidden flex items-center gap-2">
+          <button
+            type="button"
+            class="theme-btn"
+            data-theme-toggle
+            aria-label="Basculer entre le mode jour et le mode nuit"
+            title="Mode jour / nuit"
+          >
+            <svg
+              class="sunico"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4.2" fill="#E37B3C" stroke="none" />
+              <path
+                d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
+              />
+            </svg>
+            <svg
+              class="moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+                fill="#F2DCC2"
+              />
+              <circle cx="17.5" cy="5.5" r="1" fill="#E37B3C" />
+            </svg>
+          </button>
+          <a class="btn btn-sun !py-2 !px-4 text-sm" href="#contact">Contact</a>
+        </div>
       </div>
     </header>
 
@@ -722,7 +957,7 @@
               Billets · Hôtels · Visas · Séjours sur-mesure
             </p>
             <h1
-              class="text-[clamp(2.6rem,6.4vw,5.4rem)] leading-[1.02] text-terre hero-in"
+              class="text-[clamp(2.6rem,6.4vw,5.4rem)] leading-[1.02] text-heading hero-in"
             >
               Le monde<br />commence <span class="grad-text">ici.</span>
             </h1>
@@ -773,7 +1008,7 @@
           </div>
         </div>
         <div
-          class="absolute left-1/2 -translate-x-1/2 bottom-5 flex flex-col items-center gap-2 text-terre/70"
+          class="absolute left-1/2 -translate-x-1/2 bottom-5 flex flex-col items-center gap-2 text-heading/70"
           aria-hidden="true"
         >
           <span class="eyebrow text-[.62rem]">Défilez pour décoller</span>
@@ -785,7 +1020,7 @@
 
       <!-- TICKER -->
       <div
-        class="relative overflow-hidden py-4 bg-terre/95 text-sable"
+        class="relative overflow-hidden py-4 bg-band text-sable"
         aria-hidden="true"
       >
         <div class="ticker mono text-sm tracking-[.2em]" id="ticker"></div>
@@ -797,12 +1032,12 @@
           <div
             class="max-w-5xl w-full mx-auto text-center flex flex-col items-center gap-8"
           >
-            <p class="eyebrow text-terre" id="b-eyebrow">
+            <p class="eyebrow text-heading" id="b-eyebrow">
               Porte TS-08 · Embarquement immédiat
             </p>
             <h2
               id="b-title"
-              class="text-[clamp(2.2rem,7vw,6rem)] leading-[1] text-terre"
+              class="text-[clamp(2.2rem,7vw,6rem)] leading-[1] text-heading"
             >
               Au-dessus des nuages,<br /><span class="grad-text"
                 >tout est déjà prévu.</span
@@ -812,7 +1047,7 @@
               <div class="pass w-[min(640px,100%)] text-left" id="pass">
                 <div class="p-5 md:p-7 min-w-0">
                   <div class="flex items-center justify-between gap-4">
-                    <span class="font-display text-terre text-lg"
+                    <span class="font-display text-heading text-lg"
                       >TRAVEL STUDIO</span
                     >
                     <span class="eyebrow text-soleil text-[.62rem]"
@@ -826,7 +1061,9 @@
                       >
                         De
                       </div>
-                      <div class="font-display text-3xl md:text-4xl text-terre">
+                      <div
+                        class="font-display text-3xl md:text-4xl text-heading"
+                      >
                         ICI
                       </div>
                     </div>
@@ -861,7 +1098,7 @@
                       >
                         Passager
                       </div>
-                      <div class="mono text-terre">VOUS</div>
+                      <div class="mono text-heading">VOUS</div>
                     </div>
                     <div>
                       <div
@@ -869,7 +1106,7 @@
                       >
                         Porte
                       </div>
-                      <div class="mono text-terre">TS-08</div>
+                      <div class="mono text-heading">TS-08</div>
                     </div>
                     <div>
                       <div
@@ -877,7 +1114,7 @@
                       >
                         Siège
                       </div>
-                      <div class="mono text-terre">1A</div>
+                      <div class="mono text-heading">1A</div>
                     </div>
                     <div>
                       <div
@@ -885,7 +1122,7 @@
                       >
                         Classe
                       </div>
-                      <div class="mono text-terre">SUR-MESURE</div>
+                      <div class="mono text-heading">SUR-MESURE</div>
                     </div>
                   </div>
                   <div class="barcode mt-5 rounded-sm opacity-80"></div>
@@ -946,14 +1183,14 @@
       <!-- DESTINATIONS -->
       <section
         id="destinations"
-        class="relative gutter py-24 md:py-32 bg-creme"
+        class="relative gutter py-24 md:py-32 bg-surface"
       >
         <div class="max-w-7xl mx-auto">
           <div class="grid md:grid-cols-12 gap-6 items-end mb-12">
             <div class="md:col-span-7 reveal">
               <p class="eyebrow text-soleil">Destinations</p>
               <h2
-                class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] text-terre mt-2"
+                class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] text-heading mt-2"
               >
                 Où partez-vous<br />cette saison ?
               </h2>
@@ -979,13 +1216,13 @@
       <section
         id="etapes"
         class="relative gutter py-24 md:py-28"
-        style="background: linear-gradient(180deg, var(--creme), var(--sable))"
+        style="background: linear-gradient(180deg, var(--bg), var(--bg-2))"
       >
         <div class="max-w-7xl mx-auto">
           <div class="max-w-2xl reveal">
             <p class="eyebrow text-soleil">Comment ça marche</p>
             <h2
-              class="text-[clamp(2rem,4.2vw,3.2rem)] leading-[1.05] text-terre mt-2"
+              class="text-[clamp(2rem,4.2vw,3.2rem)] leading-[1.05] text-heading mt-2"
             >
               De la première question au retour, quatre étapes.
             </h2>
@@ -998,10 +1235,10 @@
             <ol class="grid md:grid-cols-4 gap-8 relative">
               <li class="reveal">
                 <span
-                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
                   >1</span
                 >
-                <h3 class="text-xl text-terre mt-5">Vous nous écrivez</h3>
+                <h3 class="text-xl text-heading mt-5">Vous nous écrivez</h3>
                 <p class="text-[color:var(--muted)] mt-2">
                   Destination, dates, budget, nombre de voyageurs : quelques
                   lignes suffisent pour commencer.
@@ -1009,10 +1246,12 @@
               </li>
               <li class="reveal">
                 <span
-                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
                   >2</span
                 >
-                <h3 class="text-xl text-terre mt-5">Proposition sur-mesure</h3>
+                <h3 class="text-xl text-heading mt-5">
+                  Proposition sur-mesure
+                </h3>
                 <p class="text-[color:var(--muted)] mt-2">
                   Un conseiller compare les vols et hébergements et vous envoie
                   une proposition détaillée.
@@ -1020,10 +1259,10 @@
               </li>
               <li class="reveal">
                 <span
-                  class="w-12 h-12 rounded-full bg-creme border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
+                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
                   >3</span
                 >
-                <h3 class="text-xl text-terre mt-5">
+                <h3 class="text-xl text-heading mt-5">
                   Réservations et formalités
                 </h3>
                 <p class="text-[color:var(--muted)] mt-2">
@@ -1036,7 +1275,7 @@
                   class="w-12 h-12 rounded-full bg-soleil flex items-center justify-center font-display text-creme text-xl relative"
                   >4</span
                 >
-                <h3 class="text-xl text-terre mt-5">Bon voyage</h3>
+                <h3 class="text-xl text-heading mt-5">Bon voyage</h3>
                 <p class="text-[color:var(--muted)] mt-2">
                   Vous partez avec un carnet de voyage complet et un contact
                   joignable pendant votre séjour.
@@ -1092,7 +1331,7 @@
 
           <form
             id="form"
-            class="lg:col-span-7 bg-creme text-nuit rounded-[24px] p-6 md:p-9 shadow-2xl grid sm:grid-cols-2 gap-5 reveal"
+            class="lg:col-span-7 bg-surface text-ink rounded-[24px] p-6 md:p-9 shadow-2xl grid sm:grid-cols-2 gap-5 reveal"
             novalidate
           >
             <input
@@ -1218,7 +1457,7 @@
       </section>
     </main>
 
-    <footer class="bg-nuit text-sable gutter py-12">
+    <footer class="text-sable" style="background: var(--foot) gutter py-12">
       <div
         class="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:items-center md:justify-between"
       >
@@ -1641,7 +1880,7 @@
       ${ART[s.art]}
     </div>
     <div class="svc-body">
-      <h3 class="text-[1.45rem] leading-tight text-terre">${s.t}</h3>
+      <h3 class="text-[1.45rem] leading-tight text-heading">${s.t}</h3>
       <p class="text-[.95rem] text-[color:var(--muted)]">${s.d}</p>
       <a href="#contact" data-service="${s.t}" data-objet="${s.o}" class="svc-cta relative z-10 mt-1 text-sm font-medium text-soleil inline-flex items-center gap-1.5">Demander ce service <span aria-hidden="true">→</span></a>
     </div>
@@ -1659,7 +1898,7 @@
     <div class="l photo" data-z="22"><img src="${d.photo}" alt="${d.ville}, ${d.pays}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><div class="tint"></div></div>
     <div class="l" data-z="70" style="pointer-events:none">
       <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
-        <span class="mono text-[.7rem] tracking-[.2em] px-2 py-1 rounded bg-creme text-terre">${d.code}</span>
+        <span class="mono text-[.7rem] tracking-[.2em] px-2 py-1 rounded bg-surface text-heading">${d.code}</span>
       </div>
       <div class="cap">
         <h3 class="text-2xl">${d.pays}</h3>
@@ -1777,10 +2016,11 @@
           globe.rotation.x = 0.28;
 
           // core
+          const coreMat = new THREE.MeshBasicMaterial({ color: 0xf6e7d2 });
           globe.add(
             new THREE.Mesh(
               new THREE.SphereGeometry(R * 0.985, 64, 64),
-              new THREE.MeshBasicMaterial({ color: 0xf6e7d2 }),
+              coreMat,
             ),
           );
           // dotted surface
@@ -1798,6 +2038,14 @@
             const c = cA.clone().lerp(cB, m);
             col.set([c.r, c.g, c.b], i * 3);
           }
+          const colDark = new Float32Array(N * 3),
+            cA2 = new THREE.Color(C.sable);
+          for (let i = 0; i < N; i++) {
+            const m = (Math.sin(i * 0.37) + Math.sin(i * 0.051)) * 0.25 + 0.5;
+            const c = cA2.clone().lerp(cB, m);
+            colDark.set([c.r, c.g, c.b], i * 3);
+          }
+          const colLight = col.slice();
           const pg = new THREE.BufferGeometry();
           pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
           pg.setAttribute("color", new THREE.BufferAttribute(col, 3));
@@ -1896,6 +2144,7 @@
           });
 
           // flight arcs
+          let arcMatB = null;
           const ROUTES = [
             ["CDG", "JFK"],
             ["CDG", "RAK"],
@@ -1922,11 +2171,19 @@
             );
             const line = new THREE.Line(
               g,
-              new THREE.LineBasicMaterial({
-                color: i % 2 ? 0x5b3e2f : 0xe37b3c,
-                transparent: true,
-                opacity: 0.85,
-              }),
+              i % 2
+                ? (arcMatB =
+                    arcMatB ||
+                    new THREE.LineBasicMaterial({
+                      color: 0x5b3e2f,
+                      transparent: true,
+                      opacity: 0.85,
+                    }))
+                : new THREE.LineBasicMaterial({
+                    color: 0xe37b3c,
+                    transparent: true,
+                    opacity: 0.85,
+                  }),
             );
             g.setDrawRange(0, 0);
             globe.add(line);
@@ -2098,18 +2355,69 @@
             clouds,
             sun,
           };
+          three.applyTheme = (dark) => {
+            coreMat.color.set(dark ? 0x2b1e17 : 0xf6e7d2);
+            pg.attributes.color.array.set(dark ? colDark : colLight);
+            pg.attributes.color.needsUpdate = true;
+            if (arcMatB) arcMatB.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
+            pm.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
+            clouds.children.forEach((c) => {
+              c.material.color.setHSL(
+                0.06,
+                dark ? 0.35 : 0.6,
+                dark ? 0.3 + Math.random() * 0.08 : 0.93 + Math.random() * 0.06,
+              );
+            });
+            sun.material.opacity = dark ? 0.55 : 1;
+            glow.material.opacity = dark ? 0.8 : 1;
+          };
         }
 
         /* ---------------- SKY + SCROLL STATE ---------------- */
         const lerp = (a, b, t) => a + (b - a) * t,
           clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)),
           ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-        const STOPS = [
+        const STOPS_DAY = [
           [0, "#FDFCF0"],
           [0.45, "#F9E2C6"],
           [0.8, "#F3B884"],
           [1, "#E9955C"],
         ];
+        const STOPS_NIGHT = [
+          [0, "#1C130E"],
+          [0.45, "#2A1A12"],
+          [0.8, "#4E2817"],
+          [1, "#7A3A1E"],
+        ];
+        let STOPS = STOPS_DAY;
+        const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+        const isDark = () => {
+          const t = document.documentElement.getAttribute("data-theme");
+          return t ? t === "dark" : darkMQ.matches;
+        };
+        function applyTheme() {
+          const d = isDark();
+          STOPS = d ? STOPS_NIGHT : STOPS_DAY;
+          if (three && three.applyTheme) three.applyTheme(d);
+          document
+            .querySelectorAll("[data-theme-toggle]")
+            .forEach((b) => b.setAttribute("aria-pressed", String(d)));
+          if (typeof measure === "function") measure();
+        }
+        document.querySelectorAll("[data-theme-toggle]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const next = isDark() ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("ts-theme", next);
+            } catch (e) {}
+            applyTheme();
+          }),
+        );
+        darkMQ.addEventListener?.("change", () => {
+          if (!document.documentElement.getAttribute("data-theme"))
+            applyTheme();
+        });
         const hex2 = (h) =>
           [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
         const skyAt = (t) => {
@@ -2244,7 +2552,7 @@
           renderer.render(scene, camera);
         }
         resize();
-        measure();
+        applyTheme();
         loop();
 
         /* ---------------- GSAP ---------------- */
@@ -2462,9 +2770,9 @@
             form.reset();
           } catch (err) {
             const recap = `À : ${MAIL}\nObjet : ${data.objet}\n\nNom : ${data.nom}\nE-mail : ${data.email}\nTéléphone : ${data.telephone || "-"}\nService : ${data.service}\nDestination : ${data.destination || "-"}\nDépart : ${data.date_depart || "-"}\nVoyageurs : ${data.voyageurs || "-"}\n\n${data.message}`;
-            status.innerHTML = `<div class="rounded-xl p-4 bg-sable text-terre">
+            status.innerHTML = `<div class="rounded-xl p-4 bg-sable text-heading">
       <strong>Votre demande n'a pas pu être transmise en ligne.</strong> Rien n'a été envoyé. Copiez le récapitulatif ci-dessous et envoyez-le par e-mail à <span class="mono select-all">${MAIL}</span>.
-      <pre id="recap" class="mt-3 p-3 rounded-lg bg-creme text-xs whitespace-pre-wrap overflow-x-auto mono"></pre>
+      <pre id="recap" class="mt-3 p-3 rounded-lg bg-surface text-xs whitespace-pre-wrap overflow-x-auto mono"></pre>
       <button type="button" id="copy-recap" data-target="recap" class="mt-3 btn btn-sun !py-2 !px-4 text-sm">Copier le récapitulatif</button></div>`;
             document.getElementById("recap").textContent = recap;
             document
