@@ -6,16 +6,16 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
+    <title>Travel Studio · Agence de voyages</title>
     <meta
       name="description"
       content="Travel Studio, agence de voyages : billets d'avion, hôtels, packages touristiques, conciergerie, visas, assurance voyage et conseils."
     />
-    <title>Travel Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500;600&display=swap"
     />
     <script>
       (function () {
@@ -37,11 +37,6 @@
               soleil: "#E37B3C",
               sable: "#F2DCC2",
               nuit: "#3A271D",
-              peche: "#F6C9A0",
-              surface: "rgb(var(--surface-rgb) / <alpha-value>)",
-              heading: "rgb(var(--heading-rgb) / <alpha-value>)",
-              ink: "rgb(var(--ink-rgb) / <alpha-value>)",
-              band: "rgb(var(--band-rgb) / <alpha-value>)",
             },
             fontFamily: {
               display: ["Marcellus", "Georgia", "Times New Roman", "serif"],
@@ -53,13 +48,6 @@
                 "Arial",
                 "sans-serif",
               ],
-              mono: [
-                "DM Mono",
-                "ui-monospace",
-                "Menlo",
-                "Consolas",
-                "monospace",
-              ],
             },
           },
         },
@@ -70,94 +58,164 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <style>
-      /* Layout: a single journey — globe at sunrise, take-off through the clouds, a horizontal boarding-tag corridor of services, postcards of destinations, then the arrival desk (contact). */
+      /* =====================================================================
+   SYSTÈME DE DESIGN
+   Grille : conteneur 1240px, 12 colonnes. Espacements : base 8px.
+   Couleurs 60/30/10 : 60 % blanc crème (fond), 30 % marron terre (titres, sections fortes), 10 % orange soleil (actions, accents).
+   Typographie : 2 familles. Marcellus (titres, comme le logo) + Jost (texte, labels, interface).
+   Échelle : label 12 · petit 14 · texte 16 · intro 20 · H3 26 · H2 60 · H1 92 (px, max).
+   ===================================================================== */
       :root {
         --creme: #fdfcf0;
         --terre: #5b3e2f;
         --soleil: #e37b3c;
         --sable: #f2dcc2;
-        --peche: #f6c9a0;
         --nuit: #3a271d;
         --or: #f1a55b;
-        /* semantic tokens — light (jour) */
+        --cuivre: #c9622c;
+        --on-dark: #fff9f0;
+
         --bg: #fdfcf0;
-        --bg-2: #f2dcc2;
-        --surface: #fdfcf0;
-        --surface-rgb: 253 252 240;
+        --bg-2: #f6ead8;
+        --surface: #fffdf7;
         --field: #ffffff;
         --heading: #5b3e2f;
-        --heading-rgb: 91 62 47;
-        --ink: #3a271d;
-        --ink-rgb: 58 39 29;
+        --ink: #4a3428;
         --muted: #7a5f50;
-        --line: rgba(91, 62, 47, 0.18);
-        --nav-bg: rgba(253, 252, 240, 0.86);
-        --band-rgb: 91 62 47;
-        --foot: #3a271d;
+        --error: #b8431a;
+        --line: rgba(91, 62, 47, 0.14);
+        --line-strong: rgba(91, 62, 47, 0.3);
+        --nav-bg: rgba(253, 252, 240, 0.8);
+        --foot: #2a1b13;
         --board: #3a271d;
         --flap: #4a3427;
-        --shadow: rgba(58, 39, 29, 0.55);
+        --shadow: rgba(58, 39, 29, 0.22);
+        --shadow-strong: rgba(58, 39, 29, 0.45);
+        --glass: rgba(255, 253, 247, 0.74);
+        --glass-line: rgba(91, 62, 47, 0.12);
+
+        --grad-sun: linear-gradient(
+          135deg,
+          #f1a55b 0%,
+          #e37b3c 50%,
+          #c9622c 100%
+        );
+        --grad-btn: linear-gradient(
+          110deg,
+          #e8873f 0%,
+          #d46a2e 40%,
+          #b5521d 70%,
+          #d46a2e 100%
+        );
+        --grad-earth: linear-gradient(160deg, #5b3e2f 0%, #3a271d 100%);
+        --grad-text: linear-gradient(
+          100deg,
+          #5b3e2f 0%,
+          #c9622c 45%,
+          #e37b3c 70%,
+          #f1a55b 100%
+        );
+        --grad-section: linear-gradient(180deg, #fdfcf0 0%, #f6ead8 100%);
+
         --f-display: "Marcellus", Georgia, "Times New Roman", serif;
         --f-body: "Jost", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
-        --f-mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+
+        --fs-label: 0.75rem;
+        --fs-sm: 0.875rem;
+        --fs-body: 1rem;
+        --fs-lead: clamp(1.0625rem, 0.97rem + 0.4vw, 1.25rem);
+        --fs-h3: clamp(1.3125rem, 1.15rem + 0.55vw, 1.625rem);
+        --fs-h2: clamp(2.125rem, 1.35rem + 3.1vw, 3.75rem);
+        --fs-h1: clamp(2.875rem, 1.5rem + 5.4vw, 5.75rem);
+
+        --section: clamp(96px, 11vw, 160px);
+        --head-gap: clamp(48px, 6vw, 88px);
+        --radius: 24px;
+        --radius-sm: 12px;
         color-scheme: light;
       }
-      /* nuit : la même charte, inversée — terre profonde en fond, sable pour les titres, l'orange soleil reste l'accent */
       @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) {
-          --bg: #1c130e;
-          --bg-2: #2a1b13;
-          --surface: #2b1e17;
-          --surface-rgb: 43 30 23;
-          --field: #22170f;
-          --heading: #f2dcc2;
-          --heading-rgb: 242 220 194;
-          --ink: #efe3d2;
-          --ink-rgb: 239 227 210;
-          --muted: #bfa48f;
-          --line: rgba(242, 220, 194, 0.16);
-          --nav-bg: rgba(28, 19, 14, 0.82);
-          --band-rgb: 43 30 23;
-          --foot: #120c09;
+          --bg: #1a120d;
+          --bg-2: #22170f;
+          --surface: #2a1d15;
+          --field: #20160f;
+          --heading: #f4e4ce;
+          --ink: #e6d6c2;
+          --muted: #b89d87;
+          --error: #f08a5d;
+          --line: rgba(242, 220, 194, 0.12);
+          --line-strong: rgba(242, 220, 194, 0.28);
+          --nav-bg: rgba(26, 18, 13, 0.8);
+          --foot: #0f0a07;
           --board: #120c09;
-          --flap: #2b1e17;
-          --shadow: rgba(0, 0, 0, 0.7);
+          --flap: #2a1d15;
+          --shadow: rgba(0, 0, 0, 0.4);
+          --shadow-strong: rgba(0, 0, 0, 0.7);
+          --glass: rgba(42, 29, 21, 0.74);
+          --glass-line: rgba(242, 220, 194, 0.12);
+          --grad-earth: linear-gradient(160deg, #2e1f16 0%, #0f0a07 100%);
+          --grad-text: linear-gradient(
+            100deg,
+            #f4e4ce 0%,
+            #f1a55b 50%,
+            #e37b3c 100%
+          );
+          --grad-section: linear-gradient(180deg, #1a120d 0%, #22170f 100%);
           color-scheme: dark;
         }
       }
       :root[data-theme="dark"] {
-        --bg: #1c130e;
-        --bg-2: #2a1b13;
-        --surface: #2b1e17;
-        --surface-rgb: 43 30 23;
-        --field: #22170f;
-        --heading: #f2dcc2;
-        --heading-rgb: 242 220 194;
-        --ink: #efe3d2;
-        --ink-rgb: 239 227 210;
-        --muted: #bfa48f;
-        --line: rgba(242, 220, 194, 0.16);
-        --nav-bg: rgba(28, 19, 14, 0.82);
-        --band-rgb: 43 30 23;
-        --foot: #120c09;
+        --bg: #1a120d;
+        --bg-2: #22170f;
+        --surface: #2a1d15;
+        --field: #20160f;
+        --heading: #f4e4ce;
+        --ink: #e6d6c2;
+        --muted: #b89d87;
+        --error: #f08a5d;
+        --line: rgba(242, 220, 194, 0.12);
+        --line-strong: rgba(242, 220, 194, 0.28);
+        --nav-bg: rgba(26, 18, 13, 0.8);
+        --foot: #0f0a07;
         --board: #120c09;
-        --flap: #2b1e17;
-        --shadow: rgba(0, 0, 0, 0.7);
+        --flap: #2a1d15;
+        --shadow: rgba(0, 0, 0, 0.4);
+        --shadow-strong: rgba(0, 0, 0, 0.7);
+        --glass: rgba(42, 29, 21, 0.74);
+        --glass-line: rgba(242, 220, 194, 0.12);
+        --grad-earth: linear-gradient(160deg, #2e1f16 0%, #0f0a07 100%);
+        --grad-text: linear-gradient(
+          100deg,
+          #f4e4ce 0%,
+          #f1a55b 50%,
+          #e37b3c 100%
+        );
+        --grad-section: linear-gradient(180deg, #1a120d 0%, #22170f 100%);
         color-scheme: dark;
       }
+
+      /* ---------- Base ---------- */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
       html {
-        scroll-behavior: auto;
+        -webkit-text-size-adjust: 100%;
       }
       body {
+        margin: 0;
         background: var(--bg);
         color: var(--ink);
+        font-family: var(--f-body);
+        font-size: var(--fs-body);
+        line-height: 1.7;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
         transition:
           background-color 0.5s,
           color 0.5s;
-        font-family: var(--f-body);
-        font-size: 16px;
-        line-height: 1.6;
-        overflow-x: hidden;
       }
       body::before {
         content: "";
@@ -167,51 +225,188 @@
         z-index: 60;
         background: var(--bg);
       }
-      h1,
-      h2,
-      h3 {
-        font-family: var(--f-display);
-        font-weight: 400;
-        text-wrap: balance;
-        letter-spacing: 0.01em;
+      img {
+        max-width: 100%;
       }
-      .gutter {
-        padding-left: max(16px, env(safe-area-inset-left, 0px));
-        padding-right: max(16px, env(safe-area-inset-right, 0px));
-      }
-      .eyebrow {
-        font-family: var(--f-mono);
-        font-size: 0.74rem;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-      }
-      .mono {
-        font-family: var(--f-mono);
+      a {
+        color: inherit;
+        text-decoration: none;
       }
       :focus-visible {
         outline: 2px solid var(--soleil);
         outline-offset: 3px;
-        border-radius: 4px;
+        border-radius: 6px;
       }
-
-      /* Sky + 3D canvas */
-      #sky {
-        position: fixed;
-        inset: 0;
-        z-index: -2;
-        background: var(--bg);
-        transition: background 0.2s linear;
+      .gutter {
+        padding-left: max(20px, env(safe-area-inset-left, 0px));
+        padding-right: max(20px, env(safe-area-inset-right, 0px));
       }
-      #gl {
-        position: fixed;
-        inset: 0;
+      @media (min-width: 640px) {
+        .gutter {
+          padding-left: max(32px, env(safe-area-inset-left, 0px));
+          padding-right: max(32px, env(safe-area-inset-right, 0px));
+        }
+      }
+      .wrap {
+        max-width: 1240px;
+        margin-inline: auto;
         width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
+      }
+      .section {
+        padding-block: var(--section);
+        position: relative;
       }
 
-      /* Nav */
+      /* ---------- Typographie ---------- */
+      .t-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: var(--fs-label);
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--soleil);
+        line-height: 1.2;
+      }
+      .t-label::before {
+        content: "";
+        width: 28px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--grad-sun);
+      }
+      .t-h1,
+      .t-h2,
+      .t-h3 {
+        font-family: var(--f-display);
+        font-weight: 400;
+        color: var(--heading);
+        margin: 0;
+        text-wrap: balance;
+      }
+      .t-h1 {
+        font-size: var(--fs-h1);
+        line-height: 1.02;
+        letter-spacing: -0.015em;
+      }
+      .t-h2 {
+        font-size: var(--fs-h2);
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+      }
+      .t-h3 {
+        font-size: var(--fs-h3);
+        line-height: 1.2;
+      }
+      .t-lead {
+        font-size: var(--fs-lead);
+        line-height: 1.65;
+        color: var(--muted);
+        margin: 0;
+        max-width: 34em;
+      }
+      .t-body {
+        color: var(--muted);
+        margin: 0;
+        max-width: 36em;
+      }
+      .t-small {
+        font-size: var(--fs-sm);
+      }
+      .t-code {
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums;
+      }
+      .grad-text {
+        background: var(--grad-text);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .section-head {
+        display: grid;
+        gap: 24px;
+        margin-bottom: var(--head-gap);
+      }
+      .section-head .stack {
+        display: grid;
+        gap: 20px;
+        justify-items: start;
+      }
+      @media (min-width: 1024px) {
+        .section-head {
+          grid-template-columns: 7fr 5fr;
+          align-items: end;
+          column-gap: 64px;
+        }
+      }
+
+      /* ---------- Boutons ---------- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 54px;
+        padding: 0 28px;
+        border-radius: 999px;
+        font-family: var(--f-body);
+        font-weight: 500;
+        font-size: var(--fs-body);
+        letter-spacing: 0.01em;
+        border: 0;
+        cursor: pointer;
+        white-space: nowrap;
+        transition:
+          transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+          box-shadow 0.35s,
+          background-position 0.7s;
+      }
+      .btn svg {
+        transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .btn:hover svg {
+        transform: translateX(3px);
+      }
+      .btn.btn-sm {
+        height: 44px;
+        padding: 0 20px;
+        font-size: var(--fs-sm);
+      }
+      .btn.btn-sun {
+        color: var(--on-dark);
+        background-image: var(--grad-btn);
+        background-size: 220% 100%;
+        box-shadow:
+          0 14px 30px -14px rgba(201, 98, 44, 0.9),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+      .btn.btn-sun:hover {
+        background-position: 100% 0;
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 40px -16px rgba(201, 98, 44, 0.95),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+      .btn.btn-ghost {
+        color: var(--heading);
+        background: transparent;
+        box-shadow: inset 0 0 0 1.5px var(--line-strong);
+      }
+      .btn.btn-ghost:hover {
+        box-shadow: inset 0 0 0 1.5px var(--heading);
+        transform: translateY(-2px);
+      }
+      .btn[disabled] {
+        opacity: 0.7;
+        cursor: progress;
+      }
+
+      /* ---------- Navigation ---------- */
       #nav {
         position: fixed;
         top: env(safe-area-inset-top, 0px);
@@ -224,445 +419,132 @@
       }
       #nav.solid {
         background: var(--nav-bg);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(16px) saturate(1.2);
+        backdrop-filter: blur(16px) saturate(1.2);
         box-shadow: 0 1px 0 var(--line);
+      }
+      #nav .bar {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand svg {
+        width: 52px;
+        height: 38px;
+        flex: 0 0 auto;
+      }
+      .brand-name {
+        white-space: nowrap;
+        display: block;
+        font-family: var(--f-display);
+        font-size: 1.25rem;
+        letter-spacing: 0.06em;
+        color: var(--heading);
+        line-height: 1;
+      }
+      .brand-sub {
+        white-space: nowrap;
+        display: block;
+        font-size: 0.625rem;
+        font-weight: 600;
+        letter-spacing: 0.32em;
+        color: var(--soleil);
+        margin-top: 6px;
+        line-height: 1;
+      }
+      .brand-txt {
+        min-width: 0;
+      }
+      @media (max-width: 479px) {
+        #nav .brand-name {
+          font-size: 1.0625rem;
+        }
+        #nav .brand-sub {
+          font-size: 0.5625rem;
+          letter-spacing: 0.24em;
+        }
+        .brand svg {
+          width: 44px;
+          height: 32px;
+        }
+        .nav-actions {
+          gap: 8px;
+        }
+      }
+      .nav-links {
+        display: none;
+        align-items: center;
+        gap: 40px;
+      }
+      @media (min-width: 960px) {
+        .nav-links {
+          display: flex;
+        }
       }
       .navlink {
         position: relative;
-        font-size: 0.92rem;
+        font-size: var(--fs-sm);
+        font-weight: 500;
         color: var(--heading);
+        padding: 6px 0;
       }
       .navlink::after {
         content: "";
         position: absolute;
         left: 0;
         right: 100%;
-        bottom: -4px;
+        bottom: 0;
         height: 2px;
-        background: linear-gradient(90deg, var(--soleil), var(--or));
-        transition: right 0.35s;
+        border-radius: 2px;
+        background: var(--grad-sun);
+        transition: right 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
       }
       .navlink:hover::after {
         right: 0;
       }
-
-      /* Buttons */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.9rem 1.5rem;
-        border-radius: 999px;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        transition:
-          transform 0.25s,
-          box-shadow 0.25s,
-          background-position 0.6s;
-      }
-      .btn-sun {
-        color: var(--creme);
-        background: linear-gradient(
-          110deg,
-          var(--soleil),
-          var(--or) 45%,
-          var(--soleil) 70%,
-          var(--terre)
-        );
-        background-size: 220% 100%;
-        box-shadow: 0 10px 30px -10px rgba(227, 123, 60, 0.7);
-      }
-      .btn-sun:hover {
-        background-position: 100% 0;
-        transform: translateY(-2px);
-      }
-      .btn-ghost {
-        color: var(--heading);
-        border: 1.5px solid var(--line);
-      }
-      .btn-ghost:hover {
-        border-color: var(--heading);
-        transform: translateY(-2px);
-      }
-
-      .grad-text {
-        background: linear-gradient(
-          100deg,
-          var(--heading) 10%,
-          var(--soleil) 55%,
-          var(--or) 80%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      /* Departures board */
-      .board {
-        background: var(--board);
-        border: 1px solid var(--line);
-        color: var(--sable);
-        border-radius: 14px;
-        box-shadow: 0 30px 60px -30px rgba(58, 39, 29, 0.8);
-      }
-      .flap {
-        display: inline-block;
-        min-width: 1.05em;
-        text-align: center;
-        background: var(--flap);
-        border-radius: 3px;
-        margin-right: 2px;
-        padding: 0 0.08em;
-        color: var(--or);
-        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.35);
-      }
-      .board-row {
-        display: grid;
-        grid-template-columns: 4.2rem 1fr auto;
-        gap: 0.8rem;
-        align-items: center;
-        padding: 0.45rem 0;
-        border-top: 1px dashed rgba(242, 220, 194, 0.15);
-      }
-      .board-row:first-child {
-        border-top: 0;
-      }
-
-      /* Ticker */
-      .ticker {
+      .nav-actions {
         display: flex;
-        width: max-content;
-        animation: tick 40s linear infinite;
+        align-items: center;
+        gap: 12px;
       }
-      @keyframes tick {
-        to {
-          transform: translateX(-50%);
+      .nav-actions .btn-cta-long {
+        display: none;
+      }
+      @media (min-width: 960px) {
+        .nav-actions .btn-cta-long {
+          display: inline-flex;
         }
-      }
-
-      /* Boarding */
-      #boarding {
-        height: 260vh;
-        position: relative;
-      }
-      #boarding .stick {
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-      .pass-wrap {
-        perspective: 1200px;
-      }
-      .pass {
-        transform-style: preserve-3d;
-        background: var(--surface);
-        color: var(--ink);
-        border-radius: 18px;
-        box-shadow: 0 40px 80px -30px var(--shadow);
-        display: grid;
-        grid-template-columns: 1fr auto;
-        overflow: hidden;
-        max-width: 100%;
-      }
-      .pass .stub {
-        border-left: 2px dashed var(--line);
-        background: linear-gradient(160deg, var(--soleil), var(--or));
-        color: var(--creme);
-      }
-      .barcode {
-        height: 44px;
-        background: repeating-linear-gradient(
-          90deg,
-          var(--heading) 0 2px,
-          transparent 2px 4px,
-          var(--heading) 4px 5px,
-          transparent 5px 8px,
-          var(--heading) 8px 11px,
-          transparent 11px 12px
-        );
-      }
-
-      /* Services corridor */
-      #services {
-        position: relative;
-        color: var(--creme);
-        --p: 0;
-        background:
-          radial-gradient(
-            60vmax 45vmax at calc(var(--p) * 100%) 110%,
-            rgba(227, 123, 60, 0.55),
-            transparent 70%
-          ),
-          radial-gradient(
-            40vmax 30vmax at calc(100% - var(--p) * 80%) -10%,
-            rgba(241, 165, 91, 0.28),
-            transparent 70%
-          ),
-          linear-gradient(
-            180deg,
-            var(--svc-a, var(--nuit)),
-            var(--svc-b, var(--terre))
-          );
-      }
-      #svc-pin {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: clamp(16px, 3vh, 32px);
-        padding-block: clamp(70px, 10vh, 96px) 24px;
-        overflow: hidden;
-      }
-      #svc-viewport {
-        perspective: 1400px;
-        perspective-origin: 50% 50%;
-      }
-      #svc-track {
-        display: flex;
-        gap: clamp(18px, 3vw, 40px);
-        width: max-content;
-        padding-left: max(16px, 6vw);
-        padding-right: max(16px, 20vw);
-        transform-style: preserve-3d;
-        will-change: transform;
-      }
-      #svc-track {
-        pointer-events: none;
-      }
-      .svc {
-        pointer-events: auto;
-        width: min(78vw, 380px);
-        flex: 0 0 auto;
-        transform-style: preserve-3d;
-        will-change: transform;
-      }
-      .svc-card {
-        position: relative;
-        height: min(62vh, 520px);
-        border-radius: 22px;
-        background: var(--surface);
-        color: var(--ink);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        transform-style: preserve-3d;
-        box-shadow: 0 50px 80px -40px rgba(0, 0, 0, 0.6);
-      }
-      .svc-art {
-        position: relative;
-        flex: 1 1 58%;
-        min-height: 0;
-        overflow: hidden;
-      }
-      .svc-art .sun {
-        position: absolute;
-        width: 42%;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        right: 10%;
-        top: 12%;
-        filter: blur(0.5px);
-      }
-      .svc-art svg {
-        position: absolute;
-        inset: auto 0 0 0;
-        width: 100%;
-        height: 88%;
-        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
-      }
-      .svc-card:hover .svc-art svg {
-        transform: translateY(-6px) scale(1.04);
-      }
-      .svc-body {
-        padding: 20px 22px 22px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .tag {
-        position: absolute;
-        top: 16px;
-        left: 16px;
-        z-index: 2;
-        font-family: var(--f-mono);
-        font-size: 0.72rem;
-        letter-spacing: 0.16em;
-        background: var(--surface);
-        color: var(--heading);
-        padding: 0.3rem 0.65rem;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.4);
-      }
-      .tag::before {
-        content: "";
-        display: inline-block;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        border: 1.5px solid var(--heading);
-        margin-right: 0.45rem;
-        vertical-align: 1px;
-      }
-      .route {
-        position: relative;
-        height: 30px;
-      }
-      .route .line {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 50%;
-        border-top: 2px dashed rgba(242, 220, 194, 0.35);
-      }
-      .route .done {
-        position: absolute;
-        left: 0;
-        top: 50%;
-        height: 2px;
-        margin-top: -1px;
-        background: linear-gradient(90deg, var(--or), var(--soleil));
-        width: 0;
-      }
-      .route .plane {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 28px;
-        height: 28px;
-        margin: -14px 0 0 -14px;
-        color: var(--or);
-        transform: rotate(90deg);
-      }
-
-      /* Destinations */
-      .dest-grid {
-        perspective: 1600px;
-      }
-      .dest {
-        transform-style: preserve-3d;
-        cursor: default;
-      }
-      .dest-inner {
-        position: relative;
-        aspect-ratio: 3/4;
-        max-width: 100%;
-        border-radius: 20px;
-        overflow: hidden;
-        transform-style: preserve-3d;
-        transition:
-          transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
-          box-shadow 0.5s;
-        box-shadow: 0 30px 50px -35px rgba(58, 39, 29, 0.7);
-      }
-      .dest:hover .dest-inner {
-        box-shadow: 0 45px 70px -35px rgba(58, 39, 29, 0.8);
-      }
-      .dest .l {
-        position: absolute;
-        inset: 0;
-        transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
-      }
-      .dest svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .dest .cap {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 18px;
-        color: var(--creme);
-        background: linear-gradient(
-          0deg,
-          rgba(58, 39, 29, 0.85),
-          rgba(58, 39, 29, 0)
-        );
-      }
-      .dest .photo {
-        inset: -6%;
-      }
-      .dest .photo img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        max-width: none;
-      }
-      .dest .photo .tint {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          180deg,
-          rgba(241, 165, 91, 0.12) 0%,
-          rgba(227, 123, 60, 0.08) 45%,
-          rgba(58, 39, 29, 0.35) 100%
-        );
-        mix-blend-mode: multiply;
-      }
-      .dest .credit {
-        margin-top: 10px;
-        font-size: 0.66rem;
-        opacity: 0.7;
-        letter-spacing: 0.03em;
-      }
-      .chip {
-        font-family: var(--f-mono);
-        font-size: 0.68rem;
-        letter-spacing: 0.12em;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        background: rgba(253, 252, 240, 0.18);
-        border: 1px solid rgba(253, 252, 240, 0.3);
-      }
-
-      /* Steps */
-      :root[data-theme="dark"] #services {
-        --svc-a: #120c09;
-        --svc-b: #3a2419;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) #services {
-          --svc-a: #120c09;
-          --svc-b: #3a2419;
-        }
-      }
-      .svc-art {
-        transition: filter 0.5s;
-      }
-      :root[data-theme="dark"] .svc-art {
-        filter: saturate(0.95) brightness(0.9);
-      }
-      @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) .svc-art {
-          filter: saturate(0.95) brightness(0.9);
+        .nav-actions .btn-cta-short {
+          display: none;
         }
       }
       .theme-btn {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         color: var(--heading);
-        border: 1.5px solid var(--line);
+        border: 0;
         background: transparent;
+        box-shadow: inset 0 0 0 1.5px var(--line-strong);
+        cursor: pointer;
         transition:
-          transform 0.4s,
-          border-color 0.3s,
-          background 0.3s;
+          transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+          box-shadow 0.3s;
         flex: 0 0 auto;
       }
       .theme-btn:hover {
-        border-color: var(--soleil);
-        transform: rotate(20deg);
+        box-shadow: inset 0 0 0 1.5px var(--soleil);
+        transform: rotate(25deg);
       }
       .theme-btn .moon {
         display: none;
@@ -681,95 +563,1272 @@
           display: none;
         }
       }
-      .step-line {
-        background: linear-gradient(
-          90deg,
-          var(--sable),
-          var(--soleil),
-          var(--terre)
-        );
+
+      /* ---------- Ciel + 3D ---------- */
+      #sky {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: var(--bg);
+      }
+      #gl {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
       }
 
-      /* Contact */
-      #contact {
-        background: linear-gradient(
-          160deg,
-          var(--soleil) 0%,
-          #c9622c 35%,
-          var(--terre) 75%,
-          var(--nuit)
+      /* ---------- Accueil ---------- */
+      .hero {
+        position: relative;
+        min-height: clamp(680px, 100svh, 960px);
+        display: flex;
+        align-items: center;
+        padding-top: 128px;
+        padding-bottom: 112px;
+      }
+      .hero-grid {
+        display: grid;
+        gap: 40px;
+        align-items: center;
+      }
+      .hero-copy {
+        display: grid;
+        gap: 28px;
+        justify-items: start;
+        position: relative;
+        z-index: 2;
+      }
+      .hero-ctas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 8px;
+      }
+      .hero-visual {
+        position: relative;
+        height: 320px;
+        order: -1;
+      }
+      @media (min-width: 1024px) {
+        .hero-grid {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          column-gap: 24px;
+        }
+        .hero-copy {
+          grid-column: 1 / span 6;
+        }
+        .hero-visual {
+          grid-column: 7 / span 6;
+          height: 600px;
+          order: 0;
+        }
+      }
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px clamp(20px, 3vw, 40px);
+        margin-top: 16px;
+        padding-top: 32px;
+        border-top: 1px solid var(--line);
+        width: 100%;
+        max-width: 34em;
+      }
+      .fact {
+        display: grid;
+        gap: 6px;
+      }
+      .fact + .fact {
+        padding-left: clamp(20px, 3vw, 40px);
+        border-left: 1px solid var(--line);
+      }
+      .fact b {
+        font-family: var(--f-display);
+        font-weight: 400;
+        font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
+        line-height: 1;
+        color: var(--heading);
+      }
+      .fact span {
+        font-size: var(--fs-sm);
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .float-card {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px 14px 14px;
+        border-radius: 18px;
+        background: var(--glass);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        box-shadow:
+          0 24px 48px -24px var(--shadow-strong),
+          inset 0 0 0 1px var(--glass-line);
+        will-change: transform;
+        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .float-card .ico {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--grad-sun);
+        color: var(--on-dark);
+        flex: 0 0 auto;
+      }
+      .float-card b {
+        display: block;
+        font-weight: 600;
+        font-size: var(--fs-sm);
+        color: var(--heading);
+        line-height: 1.3;
+      }
+      .float-card span {
+        display: block;
+        font-size: 0.8125rem;
+        color: var(--muted);
+        line-height: 1.3;
+      }
+      .float-card.a {
+        left: 0;
+        top: 14%;
+      }
+      .float-card.b {
+        right: 0;
+        bottom: 10%;
+      }
+      @media (max-width: 1023px) {
+        .float-card.a {
+          top: auto;
+          bottom: 0;
+          left: 0;
+        }
+        .float-card.b {
+          display: none;
+        }
+      }
+      .scroll-cue {
+        position: absolute;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%);
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+      }
+      .scroll-cue i {
+        width: 1.5px;
+        height: 40px;
+        background: linear-gradient(180deg, var(--soleil), transparent);
+        animation: cue 2s ease-in-out infinite;
+      }
+      @keyframes cue {
+        0%,
+        100% {
+          transform: scaleY(0.4);
+          transform-origin: top;
+        }
+        50% {
+          transform: scaleY(1);
+          transform-origin: top;
+        }
+      }
+
+      /* ---------- Bandeau ---------- */
+      .ticker-band {
+        position: relative;
+        overflow: hidden;
+        padding-block: 20px;
+        background: var(--grad-earth);
+        color: var(--sable);
+      }
+      .ticker {
+        display: flex;
+        width: max-content;
+        animation: tick 48s linear infinite;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+      }
+      .ticker span {
+        padding-inline: 28px;
+        white-space: nowrap;
+      }
+      .ticker .sep {
+        color: var(--soleil);
+        padding-inline: 0;
+      }
+      @keyframes tick {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* ---------- Embarquement ---------- */
+      #boarding {
+        height: 240vh;
+        position: relative;
+      }
+      #boarding .stick {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        height: 100svh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding-top: 72px;
+      }
+      .boarding-inner {
+        display: grid;
+        gap: clamp(32px, 6vh, 64px);
+      }
+      .boarding-head {
+        display: grid;
+        gap: 20px;
+        justify-items: center;
+        text-align: center;
+      }
+      .boarding-row {
+        display: grid;
+        gap: 32px;
+        align-items: center;
+        justify-items: center;
+        perspective: 1400px;
+      }
+      @media (min-width: 1024px) {
+        .boarding-row {
+          grid-template-columns: 7fr 5fr;
+          justify-items: stretch;
+        }
+      }
+      .pass {
+        transform-style: preserve-3d;
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: var(--radius);
+        box-shadow:
+          0 48px 96px -40px var(--shadow-strong),
+          inset 0 0 0 1px var(--line);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        overflow: hidden;
+        width: min(660px, 100%);
+        will-change: transform;
+      }
+      .pass .main {
+        padding: clamp(20px, 3vw, 32px);
+        display: grid;
+        gap: 24px;
+        min-width: 0;
+      }
+      .pass .stub {
+        border-left: 2px dashed rgba(255, 249, 240, 0.5);
+        background: var(--grad-sun);
+        color: var(--on-dark);
+        padding: clamp(18px, 2.5vw, 28px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: clamp(96px, 22vw, 150px);
+      }
+      .pass .k {
+        display: block;
+        font-size: 0.625rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .pass .v {
+        display: block;
+        font-weight: 600;
+        color: var(--heading);
+        font-size: var(--fs-sm);
+        letter-spacing: 0.06em;
+      }
+      .pass .city {
+        font-family: var(--f-display);
+        font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+        line-height: 1;
+        color: var(--heading);
+      }
+      .pass .meta {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .pass .pass-label {
+        white-space: nowrap;
+      }
+      @media (max-width: 559px) {
+        .pass .meta {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px 16px;
+        }
+        .pass .city {
+          font-size: 1.5rem;
+        }
+        .pass .pass-label {
+          display: none;
+        }
+        .pass .stub {
+          width: 84px;
+          padding: 16px 12px;
+        }
+        .pass .main {
+          gap: 18px;
+        }
+      }
+      .barcode {
+        height: 44px;
+        border-radius: 4px;
+        opacity: 0.85;
+        background: repeating-linear-gradient(
+          90deg,
+          var(--heading) 0 2px,
+          transparent 2px 4px,
+          var(--heading) 4px 5px,
+          transparent 5px 8px,
+          var(--heading) 8px 11px,
+          transparent 11px 12px
         );
       }
-      :root[data-theme="dark"] #contact {
-        background: linear-gradient(
-          160deg,
-          #b8582a 0%,
-          #7a3a1e 35%,
-          #3a2419 70%,
-          #120c09
-        );
+      .board {
+        display: none;
+        background: var(--board);
+        color: var(--sable);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow:
+          0 48px 96px -40px rgba(0, 0, 0, 0.6),
+          inset 0 0 0 1px rgba(242, 220, 194, 0.08);
+        will-change: transform;
+      }
+      @media (min-width: 1024px) {
+        .board {
+          display: block;
+        }
+      }
+      .board-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .board-row {
+        display: grid;
+        grid-template-columns: 5rem minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        padding: 12px 0;
+        border-top: 1px solid rgba(242, 220, 194, 0.1);
+        font-size: var(--fs-sm);
+      }
+      .board-row:first-of-type {
+        border-top: 0;
+      }
+      .flap {
+        display: inline-block;
+        min-width: 1.2em;
+        text-align: center;
+        background: var(--flap);
+        border-radius: 4px;
+        margin-right: 3px;
+        padding: 2px 0.1em;
+        color: var(--or);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+      }
+      .status {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(242, 220, 194, 0.6);
+      }
+      .status.on {
+        color: var(--or);
+      }
+
+      /* ---------- Services : couloir horizontal 3D ---------- */
+      #services {
+        position: relative;
+        color: var(--on-dark);
+        --p: 0;
+        background:
+          radial-gradient(
+            60vmax 45vmax at calc(var(--p) * 100%) 115%,
+            rgba(227, 123, 60, 0.5),
+            transparent 70%
+          ),
+          radial-gradient(
+            40vmax 30vmax at calc(100% - var(--p) * 80%) -10%,
+            rgba(241, 165, 91, 0.22),
+            transparent 70%
+          ),
+          linear-gradient(180deg, var(--svc-a, #3a271d), var(--svc-b, #5b3e2f));
+      }
+      :root[data-theme="dark"] #services {
+        --svc-a: #0f0a07;
+        --svc-b: #2e1f16;
       }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) #contact {
+        :root:not([data-theme="light"]) #services {
+          --svc-a: #0f0a07;
+          --svc-b: #2e1f16;
+        }
+      }
+      #services .t-h2 {
+        color: var(--on-dark);
+      }
+      #services .t-body {
+        color: rgba(242, 220, 194, 0.78);
+      }
+      #svc-pin {
+        height: 100vh;
+        height: 100svh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: clamp(20px, 3.5vh, 40px);
+        padding-top: clamp(88px, 11vh, 112px);
+        padding-bottom: clamp(20px, 4vh, 40px);
+        overflow: hidden;
+      }
+      .svc-head {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 1024px) {
+        .svc-head {
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: end;
+          column-gap: 64px;
+        }
+      }
+      .svc-head .stack {
+        display: grid;
+        gap: 16px;
+        justify-items: start;
+      }
+      .svc-count {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+      }
+      .svc-count b {
+        font-family: var(--f-display);
+        font-weight: 400;
+        font-size: clamp(2.25rem, 1.6rem + 2vw, 3.5rem);
+        line-height: 1;
+        background: var(--grad-sun);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .svc-count span {
+        font-size: var(--fs-sm);
+        color: rgba(242, 220, 194, 0.7);
+        max-width: 18em;
+        line-height: 1.5;
+      }
+      .route {
+        position: relative;
+        height: 28px;
+      }
+      .route .line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        border-top: 2px dashed rgba(242, 220, 194, 0.28);
+      }
+      .route .done {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 2px;
+        margin-top: -1px;
+        background: var(--grad-sun);
+        width: 0;
+      }
+      .route .plane {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 26px;
+        height: 26px;
+        margin: -13px 0 0 -13px;
+        color: var(--or);
+        transform: rotate(90deg);
+      }
+      #svc-viewport {
+        perspective: 1400px;
+      }
+      #svc-track {
+        display: flex;
+        gap: clamp(20px, 2.6vw, 36px);
+        width: max-content;
+        padding-left: max(20px, calc((100vw - 1240px) / 2));
+        padding-right: max(20px, 22vw);
+        transform-style: preserve-3d;
+        will-change: transform;
+        pointer-events: none;
+      }
+      .svc {
+        pointer-events: auto;
+        width: min(80vw, 360px);
+        flex: 0 0 auto;
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+      .svc-card {
+        position: relative;
+        height: min(56vh, 500px);
+        min-height: 420px;
+        border-radius: var(--radius);
+        background: var(--surface);
+        color: var(--ink);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.65);
+      }
+      .svc-art {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 120px;
+        overflow: hidden;
+        transition: filter 0.5s;
+      }
+      :root[data-theme="dark"] .svc-art {
+        filter: brightness(0.9);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .svc-art {
+          filter: brightness(0.9);
+        }
+      }
+      .svc-art .sun {
+        position: absolute;
+        width: 44%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        right: 8%;
+        top: 10%;
+        background: radial-gradient(
+          circle,
+          rgba(253, 252, 240, 0.95) 0%,
+          rgba(253, 252, 240, 0) 70%
+        );
+      }
+      .svc-art svg {
+        position: absolute;
+        inset: auto 0 0 0;
+        width: 100%;
+        height: 90%;
+        transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .svc-photo {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .svc-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transform: scale(1.04);
+        transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .svc-card:hover .svc-photo img {
+        transform: scale(1.1);
+      }
+      .svc-photo::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(58, 39, 29, 0.28) 0%,
+          rgba(227, 123, 60, 0.08) 40%,
+          rgba(58, 39, 29, 0.18) 100%
+        );
+        pointer-events: none;
+      }
+      .svc-photo .credit {
+        position: absolute;
+        right: 14px;
+        bottom: 10px;
+        z-index: 1;
+        font-size: 0.625rem;
+        letter-spacing: 0.03em;
+        color: rgba(255, 249, 240, 0.9);
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+      }
+      .svc-card:hover .svc-art svg {
+        transform: translateY(-6px) scale(1.04);
+      }
+      .svc-body {
+        padding: 24px 28px 28px;
+        display: grid;
+        gap: 12px;
+        justify-items: start;
+      }
+      .svc-body p {
+        margin: 0;
+        font-size: var(--fs-sm);
+        line-height: 1.65;
+        color: var(--muted);
+      }
+      .tag {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.6875rem;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--heading);
+        box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.4);
+      }
+      .tag::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1.5px var(--heading);
+      }
+      .svc-cta {
+        position: relative;
+        z-index: 3;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 42px;
+        padding: 0 18px;
+        margin-top: 4px;
+        border-radius: 999px;
+        font-size: var(--fs-sm);
+        font-weight: 500;
+        color: var(--soleil);
+        box-shadow: inset 0 0 0 1.5px rgba(227, 123, 60, 0.45);
+        cursor: pointer;
+        transition:
+          background 0.35s,
+          color 0.35s,
+          box-shadow 0.35s,
+          transform 0.35s;
+      }
+      .svc-cta:hover {
+        background-image: var(--grad-btn);
+        color: var(--on-dark);
+        box-shadow: inset 0 0 0 0 transparent;
+        transform: translateY(-1px);
+      }
+
+      /* ---------- Destinations (bento) ---------- */
+      #destinations {
+        background: var(--bg);
+      }
+      .bento {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-auto-rows: 380px;
+        gap: 20px;
+        perspective: 1600px;
+      }
+      @media (min-width: 640px) {
+        .bento {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-auto-rows: 320px;
+        }
+        .dest.big {
+          grid-column: span 2;
+          grid-row: span 2;
+        }
+        .dest.wide {
+          grid-column: span 2;
+        }
+      }
+      @media (min-width: 1024px) {
+        .bento {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-auto-rows: clamp(260px, 22vw, 300px);
+          gap: 24px;
+        }
+      }
+      .dest {
+        transform-style: preserve-3d;
+        min-width: 0;
+      }
+      .dest-inner {
+        position: relative;
+        height: 100%;
+        border-radius: var(--radius);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition:
+          transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+          box-shadow 0.6s;
+        box-shadow: 0 30px 60px -36px var(--shadow-strong);
+      }
+      .dest:hover .dest-inner {
+        box-shadow: 0 50px 80px -36px var(--shadow-strong);
+      }
+      .dest .l {
+        position: absolute;
+        inset: 0;
+        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .dest .l svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .dest .photo {
+        inset: -6%;
+      }
+      .dest .photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        max-width: none;
+      }
+      .dest .photo::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(241, 165, 91, 0.14),
+          rgba(227, 123, 60, 0.06) 45%,
+          rgba(58, 39, 29, 0.25)
+        );
+        mix-blend-mode: multiply;
+      }
+      .dest .ui {
+        pointer-events: none;
+      }
+      .dest .code {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 0.6875rem;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: rgba(255, 249, 240, 0.92);
+        color: #5b3e2f;
+      }
+      .dest .credit {
+        position: absolute;
+        top: 24px;
+        right: 20px;
+        font-size: 0.625rem;
+        letter-spacing: 0.04em;
+        color: rgba(255, 249, 240, 0.85);
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+      }
+      .dest .cap {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: clamp(20px, 2.4vw, 32px);
+        display: grid;
+        gap: 8px;
+        justify-items: start;
+        color: var(--on-dark);
+        background: linear-gradient(
+          0deg,
+          rgba(26, 18, 13, 0.9) 0%,
+          rgba(26, 18, 13, 0.55) 55%,
+          rgba(26, 18, 13, 0) 100%
+        );
+      }
+      .dest .cap .city {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--or);
+      }
+      .dest .cap h3 {
+        font-family: var(--f-display);
+        font-weight: 400;
+        font-size: 1.625rem;
+        line-height: 1.1;
+        margin: 0;
+      }
+      .dest.big .cap h3 {
+        font-size: clamp(2rem, 1.4rem + 1.6vw, 2.75rem);
+      }
+      .dest .cap p {
+        margin: 0;
+        font-size: var(--fs-sm);
+        line-height: 1.55;
+        color: rgba(255, 249, 240, 0.82);
+        max-width: 30em;
+      }
+      .season {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: rgba(255, 249, 240, 0.14);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        box-shadow: inset 0 0 0 1px rgba(255, 249, 240, 0.25);
+      }
+      .dest .season svg {
+        width: 13px;
+        height: 13px;
+        flex: 0 0 auto;
+        display: block;
+      }
+      .dest-foot {
+        margin-top: 48px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px 32px;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 32px;
+        border-top: 1px solid var(--line);
+      }
+
+      /* ---------- Étapes ---------- */
+      #etapes {
+        background: var(--grad-section);
+      }
+      .steps {
+        display: grid;
+        gap: 48px;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      @media (min-width: 900px) {
+        .steps {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 32px;
+        }
+      }
+      .step {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+        position: relative;
+      }
+      .step-num {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-family: var(--f-display);
+        font-size: 1.375rem;
+        color: var(--soleil);
+        background: var(--surface);
+        box-shadow:
+          inset 0 0 0 1.5px var(--soleil),
+          0 12px 24px -14px var(--shadow-strong);
+        position: relative;
+        z-index: 1;
+        margin-bottom: 8px;
+      }
+      .step:last-child .step-num {
+        background-image: var(--grad-sun);
+        color: var(--on-dark);
+        box-shadow: 0 12px 24px -10px rgba(201, 98, 44, 0.8);
+      }
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 22em;
+      }
+      .step-line {
+        display: none;
+      }
+      @media (min-width: 900px) {
+        .step-line {
+          display: block;
+          position: absolute;
+          left: 28px;
+          right: 28px;
+          top: 28px;
+          height: 2px;
           background: linear-gradient(
-            160deg,
-            #b8582a 0%,
-            #7a3a1e 35%,
-            #3a2419 70%,
-            #120c09
+            90deg,
+            var(--sable),
+            var(--soleil),
+            var(--heading)
           );
+          transform-origin: left;
+        }
+      }
+
+      /* ---------- Contact ---------- */
+      #contact {
+        color: var(--on-dark);
+        overflow: hidden;
+        background:
+          radial-gradient(
+            55% 65% at 0% 0%,
+            rgba(227, 123, 60, 0.5),
+            transparent 62%
+          ),
+          radial-gradient(
+            45% 55% at 100% 100%,
+            rgba(241, 165, 91, 0.2),
+            transparent 62%
+          ),
+          var(--grad-earth);
+      }
+      #contact .t-h2 {
+        color: var(--on-dark);
+      }
+      #contact .t-lead {
+        color: rgba(242, 220, 194, 0.85);
+      }
+      #contact .t-label {
+        color: var(--or);
+      }
+      .contact-grid {
+        display: grid;
+        gap: 56px;
+      }
+      @media (min-width: 1024px) {
+        .contact-grid {
+          grid-template-columns: 5fr 7fr;
+          column-gap: 80px;
+          align-items: start;
+        }
+      }
+      .contact-copy {
+        display: grid;
+        gap: 28px;
+        justify-items: start;
+      }
+      .direct {
+        width: 100%;
+        max-width: 28rem;
+        padding: 24px;
+        border-radius: 20px;
+        background: rgba(255, 249, 240, 0.08);
+        box-shadow: inset 0 0 0 1px rgba(255, 249, 240, 0.16);
+        display: grid;
+        gap: 12px;
+      }
+      .direct .k {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(242, 220, 194, 0.7);
+      }
+      .direct .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 16px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .direct .mail {
+        font-size: 1.125rem;
+        font-weight: 500;
+        word-break: break-all;
+        -webkit-user-select: all;
+        user-select: all;
+      }
+      .mini-btn {
+        height: 36px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: var(--on-dark);
+        font: 500 var(--fs-sm) var(--f-body);
+        box-shadow: inset 0 0 0 1px rgba(255, 249, 240, 0.4);
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .mini-btn:hover {
+        background: rgba(255, 249, 240, 0.12);
+      }
+      .checks {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 14px;
+      }
+      .checks li {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        color: rgba(242, 220, 194, 0.9);
+        font-size: var(--fs-sm);
+        line-height: 1.5;
+      }
+      .checks svg {
+        flex: 0 0 auto;
+        margin-top: 1px;
+      }
+
+      .form-card {
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: 28px;
+        padding: clamp(24px, 4vw, 48px);
+        box-shadow: 0 60px 120px -50px rgba(0, 0, 0, 0.7);
+        display: grid;
+        gap: 40px;
+        min-width: 0;
+      }
+      .form-card fieldset {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 20px;
+        min-width: 0;
+      }
+      .form-card legend {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0;
+        margin-bottom: 20px;
+        font-family: var(--f-display);
+        font-size: 1.375rem;
+        color: var(--heading);
+      }
+      .form-card legend .n {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background-image: var(--grad-sun);
+        color: var(--on-dark);
+        font: 600 0.8125rem var(--f-body);
+      }
+      .row-2 {
+        display: grid;
+        gap: 20px;
+      }
+      @media (min-width: 640px) {
+        .row-2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
       .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
+        display: grid;
+        gap: 8px;
         min-width: 0;
+        align-content: start;
       }
       .field label {
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--muted);
-        font-weight: 500;
+      }
+      .field label .opt {
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 400;
       }
       .field input,
       .field select,
       .field textarea {
+        width: 100%;
+        height: 52px;
+        padding: 0 16px;
+        border-radius: var(--radius-sm);
         background: var(--field);
         border: 1.5px solid var(--line);
-        border-radius: 12px;
-        padding: 0.8rem 0.95rem;
         color: var(--ink);
-        font: inherit;
-        width: 100%;
+        font: 400 1rem/1.4 var(--f-body);
         transition:
-          border-color 0.2s,
-          box-shadow 0.2s;
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+      .field textarea {
+        height: auto;
+        min-height: 136px;
+        padding: 14px 16px;
+        resize: vertical;
+        line-height: 1.6;
+      }
+      .field input::placeholder,
+      .field textarea::placeholder {
+        color: var(--muted);
+        opacity: 0.65;
       }
       .field input:focus,
       .field select:focus,
       .field textarea:focus {
         outline: none;
         border-color: var(--soleil);
-        box-shadow: 0 0 0 4px rgba(227, 123, 60, 0.15);
+        box-shadow: 0 0 0 4px rgba(227, 123, 60, 0.16);
       }
       .field input.prefilled {
         border-color: var(--soleil);
-        box-shadow: 0 0 0 4px rgba(227, 123, 60, 0.22);
-        transition: box-shadow 1.2s;
+        box-shadow: 0 0 0 5px rgba(227, 123, 60, 0.25);
       }
       .field .err {
-        font-size: 0.8rem;
-        color: #b5431a;
-        min-height: 1em;
+        font-size: 0.8125rem;
+        color: var(--error);
+        line-height: 1.4;
+      }
+      .field .err:empty {
+        display: none;
+      }
+      .form-foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 28px;
+        border-top: 1px solid var(--line);
+      }
+      .form-foot p {
+        margin: 0;
+        font-size: 0.8125rem;
+        color: var(--muted);
+        max-width: 22em;
+        line-height: 1.5;
+      }
+      .notice {
+        border-radius: 16px;
+        padding: 18px 20px;
+        font-size: var(--fs-sm);
+        line-height: 1.6;
+      }
+      .notice.ok {
+        background: rgba(92, 140, 82, 0.14);
+        color: var(--ink);
+        box-shadow: inset 0 0 0 1px rgba(92, 140, 82, 0.35);
+      }
+      .notice.warn {
+        background: rgba(227, 123, 60, 0.1);
+        color: var(--ink);
+        box-shadow: inset 0 0 0 1px rgba(227, 123, 60, 0.35);
+      }
+      .notice pre {
+        margin: 12px 0 0;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--field);
+        font:
+          400 0.75rem/1.6 ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
       }
 
-      .reveal {
-        will-change: transform;
+      /* ---------- Pied de page ---------- */
+      .footer {
+        background: var(--foot);
+        color: rgba(242, 220, 194, 0.8);
+        padding-top: 96px;
+        padding-bottom: 40px;
       }
+      .foot-grid {
+        display: grid;
+        gap: 48px;
+      }
+      @media (min-width: 720px) {
+        .foot-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 1024px) {
+        .foot-grid {
+          grid-template-columns: 4fr 3fr 3fr 3fr;
+          gap: 40px;
+        }
+      }
+      .footer .brand-name {
+        color: var(--creme);
+      }
+      .footer h4 {
+        margin: 0 0 20px;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--or);
+      }
+      .footer ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 12px;
+        font-size: var(--fs-sm);
+      }
+      .footer ul a {
+        transition: color 0.25s;
+      }
+      .footer ul a:hover {
+        color: var(--creme);
+      }
+      .foot-bottom {
+        margin-top: 72px;
+        padding-top: 28px;
+        border-top: 1px solid rgba(242, 220, 194, 0.12);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 32px;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: rgba(242, 220, 194, 0.55);
+      }
+      .foot-bottom a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      /* ---------- Mouvement réduit ---------- */
       @media (prefers-reduced-motion: reduce) {
-        .ticker {
+        .ticker,
+        .scroll-cue i {
           animation: none;
         }
         #boarding {
@@ -778,13 +1837,16 @@
         #boarding .stick {
           position: relative;
           height: auto;
-          padding-block: 120px;
+          padding-block: 140px;
         }
         #svc-pin {
           height: auto;
         }
         #svc-viewport {
           overflow-x: auto;
+        }
+        #svc-track {
+          pointer-events: auto;
         }
         .svc {
           transform: none !important;
@@ -796,15 +1858,11 @@
     <div id="sky"></div>
     <canvas id="gl" aria-hidden="true"></canvas>
 
-    <!-- NAV -->
+    <!-- ============ NAVIGATION ============ -->
     <header id="nav" class="gutter">
-      <div class="max-w-7xl mx-auto flex items-center justify-between py-3">
-        <a
-          href="#top"
-          class="flex items-center gap-3"
-          aria-label="Travel Studio, accueil"
-        >
-          <svg viewBox="0 0 100 72" class="w-12 h-9" aria-hidden="true">
+      <div class="wrap bar">
+        <a href="#top" class="brand" aria-label="Travel Studio, accueil">
+          <svg viewBox="0 0 100 72" aria-hidden="true">
             <defs>
               <linearGradient id="lg-sun" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stop-color="#F1A55B" />
@@ -841,134 +1899,80 @@
               />
             </g>
           </svg>
-          <span class="leading-none">
-            <span class="block font-display text-heading text-xl tracking-wide"
-              >TRAVEL STUDIO</span
-            >
-            <span
-              class="block mono text-[.62rem] tracking-[.3em] text-soleil mt-1"
-              >AGENCE DE VOYAGES</span
-            >
-          </span>
+          <span class="brand-txt"
+            ><span class="brand-name">TRAVEL STUDIO</span
+            ><span class="brand-sub">AGENCE DE VOYAGES</span></span
+          >
         </a>
-        <nav
-          class="hidden md:flex items-center gap-8"
-          aria-label="Navigation principale"
-        >
+        <nav class="nav-links" aria-label="Navigation principale">
           <a class="navlink" href="#services">Services</a>
           <a class="navlink" href="#destinations">Destinations</a>
           <a class="navlink" href="#etapes">Comment ça marche</a>
-          <a class="btn btn-sun !py-2.5 !px-5 text-sm" href="#contact"
+          <a class="navlink" href="#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button
+            type="button"
+            class="theme-btn"
+            data-theme-toggle
+            aria-label="Basculer entre le mode jour et le mode nuit"
+            title="Mode jour / nuit"
+          >
+            <svg
+              class="sunico"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4.2" fill="#E37B3C" stroke="none" />
+              <path
+                d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
+              />
+            </svg>
+            <svg
+              class="moon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+                fill="#F2DCC2"
+              />
+              <circle cx="17.5" cy="5.5" r="1" fill="#E37B3C" />
+            </svg>
+          </button>
+          <a class="btn btn-sun btn-sm btn-cta-long" href="#contact"
             >Préparer mon voyage</a
           >
-          <button
-            type="button"
-            class="theme-btn"
-            data-theme-toggle
-            aria-label="Basculer entre le mode jour et le mode nuit"
-            title="Mode jour / nuit"
+          <a class="btn btn-sun btn-sm btn-cta-short" href="#contact"
+            >Contact</a
           >
-            <svg
-              class="sunico"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="4.2" fill="#E37B3C" stroke="none" />
-              <path
-                d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
-              />
-            </svg>
-            <svg
-              class="moon"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
-                fill="#F2DCC2"
-              />
-              <circle cx="17.5" cy="5.5" r="1" fill="#E37B3C" />
-            </svg>
-          </button>
-        </nav>
-        <div class="md:hidden flex items-center gap-2">
-          <button
-            type="button"
-            class="theme-btn"
-            data-theme-toggle
-            aria-label="Basculer entre le mode jour et le mode nuit"
-            title="Mode jour / nuit"
-          >
-            <svg
-              class="sunico"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="4.2" fill="#E37B3C" stroke="none" />
-              <path
-                d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"
-              />
-            </svg>
-            <svg
-              class="moon"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
-                fill="#F2DCC2"
-              />
-              <circle cx="17.5" cy="5.5" r="1" fill="#E37B3C" />
-            </svg>
-          </button>
-          <a class="btn btn-sun !py-2 !px-4 text-sm" href="#contact">Contact</a>
         </div>
       </div>
     </header>
 
     <main id="top">
-      <!-- HERO -->
-      <section
-        class="relative gutter pt-28 md:pt-36 pb-16 min-h-[92vh] flex items-center"
-      >
-        <div
-          class="max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-10 items-center"
-        >
-          <div class="md:col-span-6 lg:col-span-6 relative z-10">
-            <p class="eyebrow text-soleil mb-5 hero-in">
-              Billets · Hôtels · Visas · Séjours sur-mesure
-            </p>
-            <h1
-              class="text-[clamp(2.6rem,6.4vw,5.4rem)] leading-[1.02] text-heading hero-in"
-            >
+      <!-- ============ ACCUEIL ============ -->
+      <section class="hero gutter">
+        <div class="wrap hero-grid">
+          <div class="hero-copy">
+            <span class="t-label hero-in">Agence de voyages sur-mesure</span>
+            <h1 class="t-h1 hero-in">
               Le monde<br />commence <span class="grad-text">ici.</span>
             </h1>
-            <p
-              class="mt-6 text-lg text-[color:var(--muted)] max-w-[34rem] hero-in"
-            >
+            <p class="t-lead hero-in">
               Travel Studio organise votre voyage de bout en bout : le vol,
-              l'hôtel, le visa, l'assurance, et chaque détail entre les deux.
-              Vous n'avez plus qu'à faire votre valise.
+              l’hôtel, le visa, l’assurance, et chaque détail entre les deux.
+              Vous n’avez plus qu’à faire votre valise.
             </p>
-            <div class="mt-8 flex flex-wrap gap-3 hero-in">
+            <div class="hero-ctas hero-in">
               <a href="#contact" class="btn btn-sun"
                 >Demander un devis
                 <svg
@@ -986,91 +1990,93 @@
                 >Voir les destinations</a
               >
             </div>
+            <div class="facts hero-in">
+              <div class="fact"><b>8</b><span>services réunis</span></div>
+              <div class="fact"><b>8</b><span>destinations phares</span></div>
+              <div class="fact"><b>1</b><span>interlocuteur unique</span></div>
+            </div>
           </div>
-
-          <div
-            class="md:col-span-6 lg:col-span-5 lg:col-start-8 relative z-10 md:self-end"
-          >
-            <div
-              class="board p-5 md:p-6 mt-[38vh] md:mt-[46vh] hero-in"
-              aria-label="Tableau des départs"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <span class="eyebrow text-[color:var(--or)]">Départs</span>
-                <span
-                  class="mono text-xs text-[color:var(--sable)] opacity-70"
-                  id="clock"
-                  >--:--</span
+          <div class="hero-visual" id="hero-visual" aria-hidden="true">
+            <div class="float-card a" data-depth="22">
+              <span class="ico"
+                ><svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-              </div>
-              <div id="board-rows" class="mono text-sm"></div>
+                  <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+              ></span>
+              <div><b>Visa accordé</b><span>E-visa · Dubaï</span></div>
+            </div>
+            <div class="float-card b" data-depth="38">
+              <span class="ico"
+                ><svg
+                  width="20"
+                  height="20"
+                  viewBox="-24 -24 48 48"
+                  style="transform: rotate(90deg)"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
+                  /></svg
+              ></span>
+              <div><b>Vol confirmé</b><span>Douala → Paris CDG</span></div>
             </div>
           </div>
         </div>
-        <div
-          class="absolute left-1/2 -translate-x-1/2 bottom-5 flex flex-col items-center gap-2 text-heading/70"
-          aria-hidden="true"
-        >
-          <span class="eyebrow text-[.62rem]">Défilez pour décoller</span>
-          <span
-            class="w-[1.5px] h-10 bg-gradient-to-b from-soleil to-transparent animate-pulse"
-          ></span>
+        <div class="scroll-cue" aria-hidden="true">
+          Défilez pour décoller<i></i>
         </div>
       </section>
 
-      <!-- TICKER -->
-      <div
-        class="relative overflow-hidden py-4 bg-band text-sable"
-        aria-hidden="true"
-      >
-        <div class="ticker mono text-sm tracking-[.2em]" id="ticker"></div>
+      <!-- ============ BANDEAU ============ -->
+      <div class="ticker-band" aria-hidden="true">
+        <div class="ticker" id="ticker"></div>
       </div>
 
-      <!-- BOARDING / CLOUDS -->
+      <!-- ============ EMBARQUEMENT ============ -->
       <section id="boarding" aria-label="Embarquement">
         <div class="stick gutter">
-          <div
-            class="max-w-5xl w-full mx-auto text-center flex flex-col items-center gap-8"
-          >
-            <p class="eyebrow text-heading" id="b-eyebrow">
-              Porte TS-08 · Embarquement immédiat
-            </p>
-            <h2
-              id="b-title"
-              class="text-[clamp(2.2rem,7vw,6rem)] leading-[1] text-heading"
-            >
-              Au-dessus des nuages,<br /><span class="grad-text"
-                >tout est déjà prévu.</span
-              >
-            </h2>
-            <div class="pass-wrap w-full flex justify-center">
-              <div class="pass w-[min(640px,100%)] text-left" id="pass">
-                <div class="p-5 md:p-7 min-w-0">
+          <div class="wrap boarding-inner">
+            <div class="boarding-head" id="b-head">
+              <span class="t-label">Porte TS-08 · Embarquement immédiat</span>
+              <h2 class="t-h2">
+                Au-dessus des nuages,<br /><span class="grad-text"
+                  >tout est déjà prévu.</span
+                >
+              </h2>
+            </div>
+            <div class="boarding-row">
+              <div class="pass" id="pass">
+                <div class="main">
                   <div class="flex items-center justify-between gap-4">
-                    <span class="font-display text-heading text-lg"
+                    <span class="brand-name" style="font-size: 1.0625rem"
                       >TRAVEL STUDIO</span
                     >
-                    <span class="eyebrow text-soleil text-[.62rem]"
-                      >Carte d'embarquement</span
+                    <span class="t-label pass-label" style="font-size: 0.625rem"
+                      >Carte d’embarquement</span
                     >
                   </div>
-                  <div class="mt-5 flex items-end justify-between gap-3">
+                  <div class="flex items-end justify-between gap-4">
                     <div>
-                      <div
-                        class="eyebrow text-[.6rem] text-[color:var(--muted)]"
-                      >
-                        De
-                      </div>
-                      <div
-                        class="font-display text-3xl md:text-4xl text-heading"
-                      >
-                        ICI
-                      </div>
+                      <span class="k">De</span><span class="city">ICI</span>
                     </div>
                     <svg
                       viewBox="-24 -24 48 48"
-                      class="w-8 h-8 mb-2 shrink-0 text-soleil"
-                      style="transform: rotate(90deg)"
+                      width="30"
+                      height="30"
+                      style="
+                        transform: rotate(90deg);
+                        color: var(--soleil);
+                        margin-bottom: 6px;
+                        flex: 0 0 auto;
+                      "
                       aria-hidden="true"
                     >
                       <path
@@ -1078,92 +2084,94 @@
                         d="M0,-22 C3,-22 4,-16 4,-8 L23,4 L23,9 L4,3 L3,14 L10,19 L10,23 L0,20 L-10,23 L-10,19 L-3,14 L-4,3 L-23,9 L-23,4 L-4,-8 C-4,-16 -3,-22 0,-22Z"
                       />
                     </svg>
-                    <div class="text-right">
-                      <div
-                        class="eyebrow text-[.6rem] text-[color:var(--muted)]"
-                      >
-                        Vers
-                      </div>
-                      <div
-                        class="font-display text-3xl md:text-4xl text-soleil"
-                      >
-                        AILLEURS
-                      </div>
+                    <div style="text-align: right">
+                      <span class="k">Vers</span
+                      ><span class="city grad-text">AILLEURS</span>
                     </div>
                   </div>
-                  <div class="mt-5 grid grid-cols-4 gap-3 text-sm">
+                  <div class="meta">
                     <div>
-                      <div
-                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
-                      >
-                        Passager
-                      </div>
-                      <div class="mono text-heading">VOUS</div>
+                      <span class="k">Passager</span><span class="v">VOUS</span>
                     </div>
                     <div>
-                      <div
-                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
-                      >
-                        Porte
-                      </div>
-                      <div class="mono text-heading">TS-08</div>
+                      <span class="k">Porte</span><span class="v">TS-08</span>
                     </div>
                     <div>
-                      <div
-                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
-                      >
-                        Siège
-                      </div>
-                      <div class="mono text-heading">1A</div>
+                      <span class="k">Siège</span><span class="v">1A</span>
                     </div>
                     <div>
-                      <div
-                        class="eyebrow text-[.56rem] text-[color:var(--muted)]"
-                      >
-                        Classe
-                      </div>
-                      <div class="mono text-heading">SUR-MESURE</div>
+                      <span class="k">Classe</span
+                      ><span class="v">SUR-MESURE</span>
                     </div>
                   </div>
-                  <div class="barcode mt-5 rounded-sm opacity-80"></div>
+                  <div class="barcode"></div>
                 </div>
-                <div
-                  class="stub p-4 md:p-6 flex flex-col justify-between w-[30vw] max-w-[150px] min-w-[96px]"
-                >
-                  <span class="eyebrow text-[.56rem]">Vol</span>
-                  <span class="font-display text-2xl md:text-3xl leading-none"
+                <div class="stub">
+                  <span class="k" style="color: rgba(255, 249, 240, 0.8)"
+                    >Vol</span
+                  >
+                  <span
+                    style="
+                      font-family: var(--f-display);
+                      font-size: clamp(1.5rem, 1rem + 1.4vw, 2rem);
+                      line-height: 1;
+                    "
                     >TS<br />2026</span
                   >
-                  <span class="mono text-[.7rem] opacity-90">BON VOYAGE</span>
+                  <span
+                    style="
+                      font-size: 0.625rem;
+                      font-weight: 600;
+                      letter-spacing: 0.16em;
+                    "
+                    >BON VOYAGE</span
+                  >
                 </div>
+              </div>
+              <div class="board" id="board" aria-label="Tableau des départs">
+                <div class="board-top">
+                  <span class="t-label" style="color: var(--or)">Départs</span>
+                  <span
+                    class="t-small"
+                    style="
+                      color: rgba(242, 220, 194, 0.6);
+                      font-variant-numeric: tabular-nums;
+                    "
+                    id="clock"
+                    >--:--</span
+                  >
+                </div>
+                <div id="board-rows"></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SERVICES : horizontal 3D corridor -->
+      <!-- ============ SERVICES ============ -->
       <section id="services" aria-label="Nos services">
         <div id="svc-pin">
           <div class="gutter">
-            <div
-              class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-4"
-            >
-              <div>
-                <p class="eyebrow text-[color:var(--or)]">
-                  Nos services · 8 escales
-                </p>
-                <h2 class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] mt-2">
-                  Tout votre voyage,<br class="hidden md:block" />
-                  sous un seul toit.
-                </h2>
+            <div class="wrap svc-head">
+              <div class="stack">
+                <span class="t-label" style="color: var(--or)"
+                  >Nos services</span
+                >
+                <h2 class="t-h2">Tout votre voyage, sous un seul toit.</h2>
               </div>
-              <p class="max-w-sm text-sable/80 text-[.98rem]">
-                Faites défiler : chaque étiquette bagage correspond à un service
-                que nous prenons en charge pour vous.
-              </p>
+              <div class="svc-count">
+                <b id="svc-count">01 / 08</b>
+                <span
+                  >Faites défiler : chaque étiquette bagage est un service que
+                  nous prenons en charge.</span
+                >
+              </div>
             </div>
-            <div class="max-w-7xl mx-auto mt-5 route" aria-hidden="true">
+            <div
+              class="wrap route"
+              aria-hidden="true"
+              style="margin-top: clamp(16px, 3vh, 32px)"
+            >
               <div class="line"></div>
               <div class="done" id="route-done"></div>
               <svg class="plane" id="route-plane" viewBox="-24 -24 48 48">
@@ -1174,109 +2182,93 @@
               </svg>
             </div>
           </div>
-          <div id="svc-viewport">
-            <div id="svc-track"></div>
-          </div>
+          <div id="svc-viewport"><div id="svc-track"></div></div>
         </div>
       </section>
 
-      <!-- DESTINATIONS -->
-      <section
-        id="destinations"
-        class="relative gutter py-24 md:py-32 bg-surface"
-      >
-        <div class="max-w-7xl mx-auto">
-          <div class="grid md:grid-cols-12 gap-6 items-end mb-12">
-            <div class="md:col-span-7 reveal">
-              <p class="eyebrow text-soleil">Destinations</p>
-              <h2
-                class="text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05] text-heading mt-2"
-              >
-                Où partez-vous<br />cette saison ?
-              </h2>
+      <!-- ============ DESTINATIONS ============ -->
+      <section id="destinations" class="section gutter">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div class="stack">
+              <span class="t-label">Destinations</span>
+              <h2 class="t-h2">Où partez-vous cette saison ?</h2>
             </div>
-            <p class="md:col-span-5 text-[color:var(--muted)] reveal">
-              Une sélection de destinations que nous organisons régulièrement.
-              Passez la souris sur une carte postale pour la voir en relief ;
-              chacune indique la meilleure période pour partir.
+            <p class="t-body">
+              Huit destinations que nous organisons régulièrement, avec la
+              meilleure période pour partir. Survolez une carte pour la voir en
+              relief.
             </p>
           </div>
-          <div
-            class="dest-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6"
-            id="dest-grid"
-          ></div>
-          <p class="mt-8 text-sm text-[color:var(--muted)] reveal">
-            Votre destination n'y figure pas ? Nous organisons des voyages vers
-            la plupart des pays : indiquez-la simplement dans le formulaire.
-          </p>
+          <div class="bento" id="dest-grid"></div>
+          <div class="dest-foot reveal">
+            <p class="t-body">
+              Votre destination n’y figure pas ? Nous organisons des voyages
+              vers la plupart des pays.
+            </p>
+            <a
+              href="#contact"
+              class="btn btn-ghost js-prefill"
+              data-objet="Autre destination"
+              data-service="Autre demande"
+              >Proposer ma destination
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" /></svg
+            ></a>
+          </div>
         </div>
       </section>
 
-      <!-- STEPS -->
-      <section
-        id="etapes"
-        class="relative gutter py-24 md:py-28"
-        style="background: linear-gradient(180deg, var(--bg), var(--bg-2))"
-      >
-        <div class="max-w-7xl mx-auto">
-          <div class="max-w-2xl reveal">
-            <p class="eyebrow text-soleil">Comment ça marche</p>
-            <h2
-              class="text-[clamp(2rem,4.2vw,3.2rem)] leading-[1.05] text-heading mt-2"
-            >
-              De la première question au retour, quatre étapes.
-            </h2>
+      <!-- ============ ÉTAPES ============ -->
+      <section id="etapes" class="section gutter">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div class="stack">
+              <span class="t-label">Comment ça marche</span>
+              <h2 class="t-h2">
+                De la première question au retour, quatre étapes.
+              </h2>
+            </div>
           </div>
-          <div class="relative mt-14">
-            <div
-              class="step-line hidden md:block absolute left-0 right-0 top-6 h-[2px] origin-left"
-              id="step-line"
-            ></div>
-            <ol class="grid md:grid-cols-4 gap-8 relative">
-              <li class="reveal">
-                <span
-                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
-                  >1</span
-                >
-                <h3 class="text-xl text-heading mt-5">Vous nous écrivez</h3>
-                <p class="text-[color:var(--muted)] mt-2">
+          <div style="position: relative">
+            <div class="step-line" id="step-line"></div>
+            <ol class="steps">
+              <li class="step reveal">
+                <span class="step-num">1</span>
+                <h3 class="t-h3">Vous nous écrivez</h3>
+                <p>
                   Destination, dates, budget, nombre de voyageurs : quelques
                   lignes suffisent pour commencer.
                 </p>
               </li>
-              <li class="reveal">
-                <span
-                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
-                  >2</span
-                >
-                <h3 class="text-xl text-heading mt-5">
-                  Proposition sur-mesure
-                </h3>
-                <p class="text-[color:var(--muted)] mt-2">
-                  Un conseiller compare les vols et hébergements et vous envoie
-                  une proposition détaillée.
+              <li class="step reveal">
+                <span class="step-num">2</span>
+                <h3 class="t-h3">Proposition sur-mesure</h3>
+                <p>
+                  Un conseiller compare les vols et les hébergements, puis vous
+                  envoie une proposition détaillée.
                 </p>
               </li>
-              <li class="reveal">
-                <span
-                  class="w-12 h-12 rounded-full bg-surface border-2 border-soleil flex items-center justify-center font-display text-soleil text-xl relative"
-                  >3</span
-                >
-                <h3 class="text-xl text-heading mt-5">
-                  Réservations et formalités
-                </h3>
-                <p class="text-[color:var(--muted)] mt-2">
+              <li class="step reveal">
+                <span class="step-num">3</span>
+                <h3 class="t-h3">Réservations et formalités</h3>
+                <p>
                   Billets, hôtels, dossier de visa et assurance : nous réservons
                   et vérifions chaque document.
                 </p>
               </li>
-              <li class="reveal">
-                <span
-                  class="w-12 h-12 rounded-full bg-soleil flex items-center justify-center font-display text-creme text-xl relative"
-                  >4</span
-                >
-                <h3 class="text-xl text-heading mt-5">Bon voyage</h3>
-                <p class="text-[color:var(--muted)] mt-2">
+              <li class="step reveal">
+                <span class="step-num">4</span>
+                <h3 class="t-h3">Bon voyage</h3>
+                <p>
                   Vous partez avec un carnet de voyage complet et un contact
                   joignable pendant votre séjour.
                 </p>
@@ -1286,152 +2278,177 @@
         </div>
       </section>
 
-      <!-- CONTACT -->
-      <section
-        id="contact"
-        class="relative gutter py-24 md:py-32 text-creme overflow-hidden"
-      >
-        <div
-          class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-14 items-start relative"
-        >
-          <div class="lg:col-span-5 reveal">
-            <p class="eyebrow text-sable">Contact</p>
-            <h2 class="text-[clamp(2.2rem,4.8vw,3.8rem)] leading-[1.03] mt-2">
-              Racontez-nous<br />le voyage dont<br />vous rêvez.
-            </h2>
-            <p class="mt-6 text-sable/90 max-w-md">
+      <!-- ============ CONTACT ============ -->
+      <section id="contact" class="section gutter">
+        <div class="wrap contact-grid">
+          <div class="contact-copy reveal">
+            <span class="t-label">Contact</span>
+            <h2 class="t-h2">Racontez-nous le voyage dont vous rêvez.</h2>
+            <p class="t-lead">
               Remplissez le formulaire : votre demande arrive directement à la
-              direction de Travel Studio, et un conseiller vous répond par
-              e-mail.
+              direction de Travel Studio.
             </p>
-            <div
-              class="mt-8 rounded-2xl p-5 bg-white/10 border border-white/20 backdrop-blur-sm max-w-md"
-            >
-              <div class="eyebrow text-[.62rem] text-sable/80">
-                Écrire directement
-              </div>
-              <div
-                class="mt-2 flex flex-wrap items-center gap-3 justify-between"
-              >
-                <span
-                  class="mono text-base md:text-lg select-all break-all"
-                  id="mail-addr"
+            <ul class="checks">
+              <li>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#F1A55B"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+                >Un conseiller vous répond par e-mail.
+              </li>
+              <li>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#F1A55B"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+                >Billets, hôtels, visa et assurance traités ensemble.
+              </li>
+              <li>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#F1A55B"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12.5l4.5 4.5L19 7.5" /></svg
+                >Un seul interlocuteur, du devis au retour.
+              </li>
+            </ul>
+            <div class="direct">
+              <span class="k">Écrire directement</span>
+              <div class="row">
+                <span class="mail" id="mail-addr"
                   >direction@travelstudio.com</span
                 >
-                <button
-                  type="button"
-                  id="copy-mail"
-                  class="text-sm px-3 py-1.5 rounded-full border border-white/40 hover:bg-white/15 transition"
-                >
-                  Copier l'adresse
+                <button type="button" id="copy-mail" class="mini-btn">
+                  Copier l’adresse
                 </button>
               </div>
             </div>
           </div>
 
-          <form
-            id="form"
-            class="lg:col-span-7 bg-surface text-ink rounded-[24px] p-6 md:p-9 shadow-2xl grid sm:grid-cols-2 gap-5 reveal"
-            novalidate
-          >
-            <input
-              type="hidden"
-              name="_subject"
-              value="Nouvelle demande · site Travel Studio"
-            />
-            <div class="field">
-              <label for="f-name">Nom complet</label
-              ><input
-                id="f-name"
-                name="nom"
-                autocomplete="name"
-                placeholder="Awa Mbarga"
-                required
-              /><span class="err" data-for="f-name"></span>
-            </div>
-            <div class="field">
-              <label for="f-email">E-mail</label
-              ><input
-                id="f-email"
-                name="email"
-                type="email"
-                autocomplete="email"
-                placeholder="vous@exemple.com"
-                required
-              /><span class="err" data-for="f-email"></span>
-            </div>
-            <div class="field sm:col-span-2">
-              <label for="f-subject">Objet</label
-              ><input
-                id="f-subject"
-                name="objet"
-                placeholder="Ex. : Conseils, Visas, Billets d’avion…"
-                required
-              /><span class="err" data-for="f-subject"></span>
-            </div>
-            <div class="field">
-              <label for="f-phone">Téléphone</label
-              ><input
-                id="f-phone"
-                name="telephone"
-                type="tel"
-                autocomplete="tel"
-                placeholder="+237 6 00 00 00 00"
-              /><span class="err"></span>
-            </div>
-            <div class="field">
-              <label for="f-service">Service souhaité</label>
-              <select id="f-service" name="service" required>
-                <option value="">Choisir un service</option></select
-              ><span class="err" data-for="f-service"></span>
-            </div>
-            <div class="field">
-              <label for="f-dest">Destination</label>
-              <input
-                id="f-dest"
-                name="destination"
-                list="dest-list"
-                placeholder="Maroc, Maldives…"
-              /><datalist id="dest-list"></datalist><span class="err"></span>
-            </div>
-            <div class="grid grid-cols-2 gap-4 min-w-0">
-              <div class="field">
-                <label for="f-date">Départ</label
-                ><input id="f-date" name="date_depart" type="date" /><span
-                  class="err"
-                ></span>
+          <form id="form" class="form-card reveal" novalidate>
+            <fieldset>
+              <legend><span class="n">1</span>Vos coordonnées</legend>
+              <div class="row-2">
+                <div class="field">
+                  <label for="f-name">Nom complet</label
+                  ><input
+                    id="f-name"
+                    name="nom"
+                    autocomplete="name"
+                    placeholder="Awa Mbarga"
+                    required
+                  /><span class="err" data-for="f-name"></span>
+                </div>
+                <div class="field">
+                  <label for="f-email">E-mail</label
+                  ><input
+                    id="f-email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="vous@exemple.com"
+                    required
+                  /><span class="err" data-for="f-email"></span>
+                </div>
               </div>
               <div class="field">
-                <label for="f-pax">Voyageurs</label
+                <label for="f-phone"
+                  >Téléphone <span class="opt">(facultatif)</span></label
                 ><input
-                  id="f-pax"
-                  name="voyageurs"
-                  type="number"
-                  min="1"
-                  max="99"
-                  value="2"
-                /><span class="err"></span>
+                  id="f-phone"
+                  name="telephone"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="+237 6 00 00 00 00"
+                />
               </div>
-            </div>
-            <div class="field sm:col-span-2">
-              <label for="f-msg">Votre projet</label
-              ><textarea
-                id="f-msg"
-                name="message"
-                rows="4"
-                placeholder="Dates flexibles, budget, envies particulières…"
-                required
-              ></textarea
-              ><span class="err" data-for="f-msg"></span>
-            </div>
-            <div
-              class="sm:col-span-2 flex flex-wrap items-center justify-between gap-4"
-            >
-              <p class="text-xs text-[color:var(--muted)] max-w-xs">
+            </fieldset>
+            <fieldset>
+              <legend><span class="n">2</span>Votre voyage</legend>
+              <div class="field">
+                <label for="f-subject">Objet</label
+                ><input
+                  id="f-subject"
+                  name="objet"
+                  placeholder="Ex. : Conseils, Visas, Billets d’avion…"
+                  required
+                /><span class="err" data-for="f-subject"></span>
+              </div>
+              <div class="row-2">
+                <div class="field">
+                  <label for="f-service">Service souhaité</label
+                  ><select id="f-service" name="service" required>
+                    <option value="">Choisir un service</option></select
+                  ><span class="err" data-for="f-service"></span>
+                </div>
+                <div class="field">
+                  <label for="f-dest">Destination</label
+                  ><input
+                    id="f-dest"
+                    name="destination"
+                    list="dest-list"
+                    placeholder="Maroc, Maldives…"
+                  /><datalist id="dest-list"></datalist>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="field">
+                  <label for="f-date">Date de départ</label
+                  ><input id="f-date" name="date_depart" type="date" />
+                </div>
+                <div class="field">
+                  <label for="f-pax">Voyageurs</label
+                  ><input
+                    id="f-pax"
+                    name="voyageurs"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value="2"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="f-msg">Votre projet</label
+                ><textarea
+                  id="f-msg"
+                  name="message"
+                  rows="4"
+                  placeholder="Dates flexibles, budget, envies particulières…"
+                  required
+                ></textarea
+                ><span class="err" data-for="f-msg"></span>
+              </div>
+            </fieldset>
+            <div class="form-foot">
+              <p>
                 Vos informations servent uniquement à répondre à votre demande.
               </p>
               <button type="submit" class="btn btn-sun" id="f-submit">
-                Envoyer ma demande
+                <span class="lbl">Envoyer ma demande</span>
                 <svg
                   width="18"
                   height="18"
@@ -1445,42 +2462,60 @@
                 </svg>
               </button>
             </div>
-            <div
-              id="f-status"
-              class="sm:col-span-2"
-              role="status"
-              aria-live="polite"
-              hidden
-            ></div>
+            <div id="f-status" role="status" aria-live="polite" hidden></div>
           </form>
         </div>
       </section>
     </main>
 
-    <footer class="text-sable" style="background: var(--foot) gutter py-12">
-      <div
-        class="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:items-center md:justify-between"
-      >
-        <div>
-          <div class="font-display text-2xl text-creme">TRAVEL STUDIO</div>
-          <div class="mono text-xs tracking-[.25em] text-soleil mt-1">
-            GUIDE DU VOYAGEUR
+    <!-- ============ PIED DE PAGE ============ -->
+    <footer class="footer gutter">
+      <div class="wrap">
+        <div class="foot-grid">
+          <div style="display: grid; gap: 20px; align-content: start">
+            <span
+              ><span class="brand-name">TRAVEL STUDIO</span
+              ><span class="brand-sub">GUIDE DU VOYAGEUR</span></span
+            >
+            <p
+              class="t-small"
+              style="margin: 0; max-width: 22em; line-height: 1.7"
+            >
+              Agence de voyages : billets d’avion, hôtels, visas, assurance et
+              séjours sur-mesure.
+            </p>
+          </div>
+          <div>
+            <h4>Services</h4>
+            <ul id="foot-services"></ul>
+          </div>
+          <div>
+            <h4>Destinations</h4>
+            <ul id="foot-dest"></ul>
+          </div>
+          <div>
+            <h4>Contact</h4>
+            <ul>
+              <li
+                style="
+                  -webkit-user-select: all;
+                  user-select: all;
+                  word-break: break-all;
+                "
+              >
+                direction@travelstudio.com
+              </li>
+              <li><a href="#contact">Formulaire de contact</a></li>
+            </ul>
           </div>
         </div>
-        <div class="flex flex-wrap gap-6 text-sm">
-          <a href="#services" class="hover:text-creme">Services</a>
-          <a href="#destinations" class="hover:text-creme">Destinations</a>
-          <a href="#contact" class="hover:text-creme">Contact</a>
-          <span class="mono">direction@travelstudio.com</span>
-        </div>
-        <div class="text-xs opacity-60">
-          © 2026 Travel Studio · Photos des destinations :
-          <a
-            href="https://www.magnific.com"
-            target="_blank"
-            rel="noopener"
-            class="underline"
-            >Magnific (ex-Freepik)</a
+        <div class="foot-bottom">
+          <span>© 2026 Travel Studio</span>
+          <span
+            >Photos des destinations :
+            <a href="https://www.magnific.com" target="_blank" rel="noopener"
+              >Magnific (ex-Freepik)</a
+            ></span
           >
         </div>
       </div>
@@ -1501,21 +2536,41 @@
         };
         const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
         const MAIL = "direction@travelstudio.com";
+        const M = "https://img.magnific.com/free-photo/";
+        const ARROW =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
-        /* ---------------- DATA ---------------- */
+        /* ================= DONNÉES ================= */
         const DEST = [
+          {
+            pays: "Maldives",
+            ville: "Malé",
+            code: "MLE",
+            lat: 4.2,
+            lon: 73.5,
+            size: "big",
+            txt: "Lagons turquoise, villas sur pilotis et récifs coralliens.",
+            saison: "Nov – avril",
+            sky: ["#FBE7C9", "#9CCBC3"],
+            art: "maldives",
+            photo:
+              M +
+              "beautiful-water-villas-tropical-maldives-island-sunrise-time_1232-4484.jpg",
+            credit: "jannoon028",
+          },
           {
             pays: "Maroc",
             ville: "Marrakech",
             code: "RAK",
             lat: 31.6,
             lon: -8.0,
-            txt: "Médinas, riads et nuits dans le désert d'Agafay.",
-            saison: "Mars–mai · Sept–nov",
+            txt: "Médinas, riads et nuits dans le désert d’Agafay.",
+            saison: "Mars – mai · sept – nov",
             sky: ["#F9D9B4", "#E37B3C"],
             art: "maroc",
             photo:
-              "https://img.magnific.com/free-photo/vertical-view-famous-koutoubia-mosque-marrakech_268835-3960.jpg?w=740",
+              M +
+              "vertical-view-famous-koutoubia-mosque-marrakech_268835-3960.jpg",
             credit: "vwalakte",
           },
           {
@@ -1525,11 +2580,12 @@
             lat: 49.0,
             lon: 2.55,
             txt: "Paris, la Provence et la Côte d’Azur.",
-            saison: "Avril–juin · Sept–oct",
+            saison: "Avril – juin · sept – oct",
             sky: ["#F4E6D6", "#E9B98E"],
             art: "france",
             photo:
-              "https://img.magnific.com/free-photo/beautiful-vertical-shot-eiffel-tower-bright-blue-sky_181624-39894.jpg?w=740",
+              M +
+              "beautiful-vertical-shot-eiffel-tower-bright-blue-sky_181624-39894.jpg",
             credit: "wirestock",
           },
           {
@@ -1539,81 +2595,71 @@
             lat: 40.6,
             lon: -73.8,
             txt: "New York, Miami, Los Angeles et les parcs nationaux.",
-            saison: "Avril–juin · Sept–nov",
+            saison: "Avril – juin · sept – nov",
             sky: ["#F1A55B", "#7A4A36"],
             art: "usa",
             photo:
-              "https://img.magnific.com/free-photo/new-york-city-skyline-aerial-view-sunset-with-colorful-cloud-skyscrapers-midtown-manhattan_649448-2373.jpg?w=740",
+              M +
+              "new-york-city-skyline-aerial-view-sunset-with-colorful-cloud-skyscrapers-midtown-manhattan_649448-2373.jpg",
             credit: "TravelScape",
           },
           {
-            pays: "Maldives",
-            ville: "Malé",
-            code: "MLE",
-            lat: 4.2,
-            lon: 73.5,
-            txt: "Lagons turquoise et villas sur pilotis.",
-            saison: "Nov–avril",
-            sky: ["#FBE7C9", "#9CCBC3"],
-            art: "maldives",
-            photo:
-              "https://img.magnific.com/free-photo/beautiful-water-villas-tropical-maldives-island-sunrise-time_1232-4484.jpg?w=740",
-            credit: "jannoon028",
-          },
-          {
-            pays: "Émirats",
+            pays: "Émirats arabes unis",
             ville: "Dubaï",
             code: "DXB",
             lat: 25.25,
             lon: 55.36,
             txt: "Dubaï, Abu Dhabi et safaris dans les dunes.",
-            saison: "Nov–mars",
+            saison: "Nov – mars",
             sky: ["#F6C9A0", "#C9622C"],
             art: "dubai",
-            photo:
-              "https://img.magnific.com/free-photo/view-dubai-marina-sunrise-uae_268835-1056.jpg?w=740",
+            photo: M + "view-dubai-marina-sunrise-uae_268835-1056.jpg",
             credit: "vwalakte",
           },
           {
             pays: "Turquie",
-            ville: "Istanbul",
+            ville: "Istanbul · Cappadoce",
             code: "IST",
             lat: 41.3,
             lon: 28.75,
-            txt: "Istanbul et les montgolfières de Cappadoce.",
-            saison: "Avril–juin · Sept–oct",
+            size: "wide",
+            txt: "Istanbul, puis les montgolfières de Cappadoce au lever du soleil.",
+            saison: "Avril – juin · sept – oct",
             sky: ["#FCE3C2", "#E8946A"],
             art: "turquie",
             photo:
-              "https://img.magnific.com/free-photo/hot-air-balloons-hills-fields-sunset-cappadocia-turkey_181624-20680.jpg?w=740",
+              M +
+              "hot-air-balloons-hills-fields-sunset-cappadocia-turkey_181624-20680.jpg",
             credit: "wirestock",
           },
           {
             pays: "Japon",
-            ville: "Tokyo",
+            ville: "Tokyo · Kyoto",
             code: "HND",
             lat: 35.55,
             lon: 139.78,
-            txt: "Tokyo, Kyoto et Osaka, des néons aux temples.",
-            saison: "Mars–mai · Oct–nov",
+            txt: "Des néons de Tokyo aux temples de Kyoto.",
+            saison: "Mars – mai · oct – nov",
             sky: ["#FBEADB", "#EFB79A"],
             art: "japon",
             photo:
-              "https://img.magnific.com/free-photo/cherry-blossoms-spring-chureito-pagoda-fuji-mountain-japan_335224-213.jpg?w=740",
+              M +
+              "cherry-blossoms-spring-chureito-pagoda-fuji-mountain-japan_335224-213.jpg",
             credit: "tawatchai07",
           },
           {
             pays: "Kenya",
-            ville: "Nairobi",
+            ville: "Nairobi · Masai Mara",
             code: "NBO",
             lat: -1.32,
             lon: 36.93,
             txt: "Safari au Masai Mara et plages de Diani.",
-            saison: "Juil–oct",
+            saison: "Juil – oct",
             sky: ["#F8C47F", "#C55A26"],
             art: "kenya",
             photo:
-              "https://img.magnific.com/free-photo/elephants-standing-each-other-green-field-kenya-africa_181624-16964.jpg?w=740",
+              M +
+              "elephants-standing-each-other-green-field-kenya-africa_181624-16964.jpg",
             credit: "wirestock",
           },
         ];
@@ -1626,6 +2672,11 @@
             d: "Nous comparons les compagnies et les itinéraires pour trouver le meilleur vol au meilleur prix, en classe éco comme en affaires.",
             sky: ["#FBE2C4", "#F1A55B"],
             art: "billet",
+            photo:
+              M +
+              "wing-through-window-airplane-amazing-sky-sunset_657883-433.jpg",
+            credit: "HelloDavidPradoPerucha",
+            alt: "Aile d’avion au coucher du soleil vue depuis le hublot",
           },
           {
             code: "HTL",
@@ -1634,6 +2685,9 @@
             d: "Hôtels, riads, resorts ou appartements : un hébergement choisi selon votre budget, votre quartier et vos envies.",
             sky: ["#F6D6BC", "#E37B3C"],
             art: "hotel",
+            photo: M + "hotel-room-luxury-resort_53876-138105.jpg",
+            credit: "rawpixel.com",
+            alt: "Chambre d’hôtel dans un resort",
           },
           {
             code: "PKG",
@@ -1642,22 +2696,33 @@
             d: "Vol, hébergement, transferts et excursions réunis dans une seule offre, prête à réserver.",
             sky: ["#FCE9CF", "#E89A5E"],
             art: "package",
+            photo: M + "suitcase-with-traveler-accessories_1150-17823.jpg",
+            credit: "jcomp",
+            alt: "Valise et accessoires de voyage",
           },
           {
             code: "CNC",
             o: "Conciergerie",
             t: "Conciergerie",
-            d: "Transferts, tables au restaurant, guides privés, billets de spectacle : on s’occupe des détails sur place.",
+            d: "Transferts, tables au restaurant, guides privés, billets de spectacle : nous nous occupons des détails sur place.",
             sky: ["#F3DCC8", "#C9622C"],
             art: "concierge",
+            photo:
+              M +
+              "hotel-bellboy-helping-guests-with-bags-carrying-luggage-room-luxury-resort-young-man-working-as-concierge-giving-assistance-people-with-suitcases-arriving-reception_482257-72422.jpg",
+            credit: "DC Studio",
+            alt: "Bagagiste aidant des clients à la réception d’un hôtel",
           },
           {
             code: "APV",
             o: "Assistance procédure visa",
             t: "Assistance procédure visa",
-            d: "Liste des pièces, remplissage des formulaires, prise de rendez-vous : nous vous accompagnons à chaque étape du dossier.",
+            d: "Liste des pièces, formulaires, prise de rendez-vous : nous vous accompagnons à chaque étape du dossier.",
             sky: ["#FBE7D2", "#F1A55B"],
             art: "dossier",
+            photo: M + "visa-application-form-laptop_23-2149117782.jpg",
+            credit: "Magnific",
+            alt: "Formulaire de demande de visa sur ordinateur portable",
           },
           {
             code: "VIS",
@@ -1666,6 +2731,9 @@
             d: "Visas touristiques, d’affaires et e-visas : nous déposons et suivons votre demande jusqu’à l’obtention.",
             sky: ["#F8D9BE", "#E37B3C"],
             art: "passeport",
+            photo: M + "passports-witn-schengen-visa_1398-396.jpg",
+            credit: "bearfotos",
+            alt: "Passeports avec visa Schengen",
           },
           {
             code: "ASS",
@@ -1674,6 +2742,9 @@
             d: "Frais médicaux, rapatriement, annulation, bagages : une couverture adaptée à votre séjour et à votre destination.",
             sky: ["#F6E2CF", "#D9733A"],
             art: "assurance",
+            photo: M + "high-angle-stethoscope-map_23-2148538267.jpg",
+            credit: "Magnific",
+            alt: "Stéthoscope posé sur une carte du monde",
           },
           {
             code: "CSL",
@@ -1682,10 +2753,15 @@
             d: "Meilleure saison, budget, itinéraire, formalités : nos conseillers répondent à toutes vos questions avant le départ.",
             sky: ["#FCEBD5", "#E89A5E"],
             art: "conseil",
+            photo:
+              M +
+              "holding-world-my-hands-attractive-female-travel-agent-showing-globe-smiling-while-working-her-modern-office_662251-2385.jpg",
+            credit: "tonodiaz",
+            alt: "Conseillère voyage présentant un globe",
           },
         ];
 
-        /* ---------------- SVG ART ---------------- */
+        /* ================= ILLUSTRATIONS (SVG) ================= */
         const plane = (x, y, r, s, fill) =>
           `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" fill="${fill}"><path d="${PLANE}"/></g>`;
         const ART = {
@@ -1693,9 +2769,9 @@
   <path d="M10 112 Q60 80 120 104 T200 92" stroke="${C.creme}" stroke-width="2" stroke-dasharray="4 6" fill="none"/>
   <g transform="translate(28 64) rotate(-8)"><rect width="128" height="58" rx="8" fill="${C.creme}"/><rect x="92" width="36" height="58" rx="8" fill="${C.soleil}"/>
   <line x1="92" y1="6" x2="92" y2="52" stroke="${C.terre}" stroke-dasharray="3 3"/>
-  <text x="12" y="22" font-family="DM Mono,monospace" font-size="11" fill="${C.terre}">DLA ✈ CDG</text>
+  <text x="12" y="22" font-family="Jost,sans-serif" font-size="11" fill="${C.terre}">DLA ✈ CDG</text>
   <rect x="12" y="32" width="60" height="4" rx="2" fill="${C.sable}"/><rect x="12" y="41" width="42" height="4" rx="2" fill="${C.sable}"/>
-  <text x="99" y="35" font-family="DM Mono,monospace" font-size="9" fill="${C.creme}">1A</text></g>
+  <text x="99" y="35" font-family="Jost,sans-serif" font-size="9" fill="${C.creme}">1A</text></g>
   ${plane(150, 36, 52, 1.15, C.terre)}</svg>`,
           hotel: `<svg viewBox="0 0 200 140" aria-hidden="true">
   <rect x="0" y="122" width="200" height="18" fill="${C.terre}"/>
@@ -1726,7 +2802,7 @@
   <circle cx="88" cy="68" r="18" fill="none" stroke="${C.or}" stroke-width="2.5"/><path d="M70 68 h36 M88 50 q-10 18 0 36 q10 -18 0 -36" stroke="${C.or}" stroke-width="2" fill="none"/>
   <text x="88" y="110" text-anchor="middle" font-family="Marcellus,serif" font-size="11" letter-spacing="2" fill="${C.or}">PASSEPORT</text></g>
   <g transform="translate(140 50) rotate(14)"><circle r="30" fill="none" stroke="${C.soleil}" stroke-width="3"/><circle r="23" fill="none" stroke="${C.soleil}" stroke-width="1.5" stroke-dasharray="3 3"/>
-  <text y="-2" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="${C.soleil}">VISA</text><text y="11" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="${C.soleil}">ACCORDÉ</text></g></svg>`,
+  <text y="-2" text-anchor="middle" font-family="Jost,sans-serif" font-size="11" font-weight="500" fill="${C.soleil}">VISA</text><text y="11" text-anchor="middle" font-family="Jost,sans-serif" font-size="7" fill="${C.soleil}">ACCORDÉ</text></g></svg>`,
           assurance: `<svg viewBox="0 0 200 140" aria-hidden="true">
   <path d="M100 18 L150 34 V72 Q150 112 100 132 Q50 112 50 72 V34Z" fill="${C.terre}"/>
   <path d="M100 30 L138 42 V72 Q138 104 100 120Z" fill="${C.soleil}"/>
@@ -1812,121 +2888,136 @@
           },
         };
 
-        /* ---------------- BUILD DOM ---------------- */
-        // Departures board
-        const rows = document.getElementById("board-rows");
-        const STAT = [
-          "À L’HEURE",
-          "EMBARQUEMENT",
-          "À L’HEURE",
-          "PORTE OUVERTE",
-          "À L’HEURE",
+        /* ================= CONSTRUCTION DU DOM ================= */
+        const esc = (s) =>
+          String(s).replace(
+            /[&<>"]/g,
+            (c) =>
+              ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+          );
+
+        // Tableau des départs
+        const BOARD = [
+          ["CDG", "Paris", "À l’heure"],
+          ["RAK", "Marrakech", "Embarquement"],
+          ["DXB", "Dubaï", "À l’heure"],
+          ["JFK", "New York", "Porte ouverte"],
+          ["MLE", "Malé", "À l’heure"],
         ];
         const flap = (s) =>
           [...s]
-            .map(
-              (ch) => `<span class="flap">${ch === " " ? "&nbsp;" : ch}</span>`,
-            )
+            .map((ch) => `<span class="flap" data-c="${ch}">${ch}</span>`)
             .join("");
-        DEST.slice(0, 5).forEach((d, i) => {
-          rows.insertAdjacentHTML(
-            "beforeend",
-            `<div class="board-row"><span>${flap(d.code)}</span><span class="truncate text-sable">${d.ville}</span><span class="text-[.7rem] tracking-wider ${i === 1 ? "text-[color:var(--or)]" : "text-sable/70"}">${STAT[i]}</span></div>`,
-          );
-        });
+        document.getElementById("board-rows").innerHTML = BOARD.map(
+          ([c, v, st], i) =>
+            `<div class="board-row"><span>${flap(c)}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v}</span><span class="status${i === 1 ? " on" : ""}">${st}</span></div>`,
+        ).join("");
         const clock = document.getElementById("clock");
         const tickClock = () => {
-          const n = new Date();
-          clock.textContent = n.toLocaleTimeString("fr-FR", {
+          clock.textContent = new Date().toLocaleTimeString("fr-FR", {
             hour: "2-digit",
             minute: "2-digit",
           });
         };
         tickClock();
         setInterval(tickClock, 30000);
-        // Split-flap shuffle on codes
-        if (!reduced) {
-          const L = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-          document.querySelectorAll(".board-row .flap").forEach((f, i) => {
-            const fin = f.textContent;
-            let n = 0;
-            const it = setInterval(() => {
-              f.textContent = L[Math.floor(Math.random() * 26)];
-              if (++n > 10 + i) {
-                clearInterval(it);
-                f.textContent = fin;
-              }
-            }, 60);
-          });
-        }
+        let shuffled = false;
+        const shuffleBoard = () => {
+          if (shuffled || reduced) return;
+          shuffled = true;
+          const L = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            flaps = [...document.querySelectorAll(".board-row .flap")],
+            t0 = performance.now();
+          const step = (now) => {
+            let busy = false;
+            flaps.forEach((f, i) => {
+              const end = 500 + i * 70;
+              if (now - t0 < end) {
+                busy = true;
+                f.textContent = L[Math.floor(Math.random() * 26)];
+              } else f.textContent = f.dataset.c;
+            });
+            if (busy) setTimeout(() => requestAnimationFrame(step), 55);
+          };
+          requestAnimationFrame(step);
+        };
 
-        // Ticker
+        // Bandeau
         const tk = DEST.map(
           (d) =>
-            `<span class="px-6">${d.code} · ${d.ville.toUpperCase()}</span><span class="text-soleil">✦</span>`,
+            `<span>${d.code} · ${d.ville.split(" · ")[0]}</span><span class="sep">✦</span>`,
         ).join("");
         document.getElementById("ticker").innerHTML = tk + tk + tk + tk;
 
         // Services
         const track = document.getElementById("svc-track");
-        track.insertAdjacentHTML(
-          "beforeend",
-          SERVICES.map(
-            (s) => `
+        track.innerHTML = SERVICES.map(
+          (s) => `
   <article class="svc"><div class="svc-card">
-    <span class="tag">${s.code}</span>
-    <div class="svc-art" style="background:linear-gradient(180deg,${s.sky[0]},${s.sky[1]})">
-      <div class="sun" style="background:radial-gradient(circle,${C.creme} 0%,rgba(253,252,240,.0) 70%)"></div>
-      ${ART[s.art]}
-    </div>
+    <span class="tag t-code">${s.code}</span>
+    <div class="svc-art" style="background:linear-gradient(180deg,${s.sky[0]},${s.sky[1]})"><div class="sun"></div>${ART[s.art]}
+      <div class="svc-photo"><img src="${s.photo}?w=720" alt="${esc(s.alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></div></div>
     <div class="svc-body">
-      <h3 class="text-[1.45rem] leading-tight text-heading">${s.t}</h3>
-      <p class="text-[.95rem] text-[color:var(--muted)]">${s.d}</p>
-      <a href="#contact" data-service="${s.t}" data-objet="${s.o}" class="svc-cta relative z-10 mt-1 text-sm font-medium text-soleil inline-flex items-center gap-1.5">Demander ce service <span aria-hidden="true">→</span></a>
+      <h3 class="t-h3">${s.t}</h3>
+      <p>${s.d}</p>
+      <a href="#contact" class="svc-cta js-prefill" data-service="${esc(s.t)}" data-objet="${esc(s.o)}">Demander ce service ${ARROW}</a>
     </div>
   </div></article>`,
-          ).join(""),
-        );
+        ).join("");
 
         // Destinations
-        const grid = document.getElementById("dest-grid");
-        grid.innerHTML = DEST.map(
+        const SUNI =
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+        document.getElementById("dest-grid").innerHTML = DEST.map(
           (d) => `
-  <article class="dest"><div class="dest-inner" style="background:linear-gradient(180deg,${d.sky[0]},${d.sky[1]})">
-    <div class="l" data-z="10"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].back}</svg></div>
-    <div class="l" data-z="40"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].front}</svg></div>
-    <div class="l photo" data-z="22"><img src="${d.photo}" alt="${d.ville}, ${d.pays}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><div class="tint"></div></div>
-    <div class="l" data-z="70" style="pointer-events:none">
-      <div class="absolute top-4 left-4 right-4 flex justify-between items-start">
-        <span class="mono text-[.7rem] tracking-[.2em] px-2 py-1 rounded bg-surface text-heading">${d.code}</span>
-      </div>
+  <article class="dest ${d.size || ""}"><div class="dest-inner" style="background:linear-gradient(180deg,${d.sky[0]},${d.sky[1]})">
+    <div class="l" data-z="8"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].back}</svg></div>
+    <div class="l" data-z="24"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${DART[d.art].front}</svg></div>
+    <div class="l photo" data-z="14"><img src="${d.photo}?w=${d.size === "big" ? 1100 : 740}" alt="${esc(d.ville)}, ${esc(d.pays)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></div>
+    <div class="l ui" data-z="46">
+      <span class="code t-code">${d.code}</span>
       <div class="cap">
-        <h3 class="text-2xl">${d.pays}</h3>
-        <p class="text-sm text-sable/90 mt-1">${d.txt}</p>
-        <div class="mt-3 flex flex-wrap gap-2"><span class="chip">MEILLEURE PÉRIODE</span><span class="chip">${d.saison.toUpperCase()}</span></div>
+        <span class="city">${d.ville}</span>
+        <h3>${d.pays}</h3>
+        <p>${d.txt}</p>
+        <span class="season">${SUNI} ${d.saison}</span>
       </div>
     </div>
   </div></article>`,
         ).join("");
 
-        // Form options
+        // Formulaire + pied de page
         const sel = document.getElementById("f-service");
         SERVICES.forEach((s) =>
           sel.insertAdjacentHTML("beforeend", `<option>${s.t}</option>`),
         );
         sel.insertAdjacentHTML("beforeend", "<option>Autre demande</option>");
         document.getElementById("dest-list").innerHTML = DEST.map(
-          (d) => `<option value="${d.pays}">`,
+          (d) => `<option value="${esc(d.pays)}">`,
+        ).join("");
+        document.getElementById("foot-services").innerHTML = SERVICES.map(
+          (s) =>
+            `<li><a href="#contact" class="js-prefill" data-service="${esc(s.t)}" data-objet="${esc(s.o)}">${s.o}</a></li>`,
+        ).join("");
+        document.getElementById("foot-dest").innerHTML = DEST.map(
+          (d) => `<li><a href="#destinations">${d.pays}</a></li>`,
         ).join("");
 
-        /* In-page navigation handled in script (works inside pinned/3D sections and in the preview frame) */
+        /* ================= NAVIGATION ================= */
+        const nav = document.getElementById("nav");
+        const onNav = () => nav.classList.toggle("solid", scrollY > 24);
+        addEventListener("scroll", onNav, { passive: true });
+        onNav();
+
+        const form = document.getElementById("form");
+        const setErr = (id, msg) => {
+          const s = form.querySelector(`.err[data-for="${id}"]`);
+          if (s) s.textContent = msg || "";
+        };
         const goTo = (id, after) => {
           const el = document.getElementById(id);
           if (!el) return;
-          const y =
-            el.getBoundingClientRect().top +
-            scrollY -
-            (document.getElementById("nav").offsetHeight || 0);
+          const y = id === "top" ? 0 : el.getBoundingClientRect().top + scrollY;
           window.scrollTo({
             top: Math.max(0, y),
             behavior: reduced ? "auto" : "smooth",
@@ -1935,11 +3026,12 @@
             let last = -1,
               n = 0;
             const wait = () => {
-              if (Math.abs(scrollY - last) < 1 && ++n > 3) {
-                after();
-                return;
-              }
-              if (Math.abs(scrollY - last) >= 1) n = 0;
+              if (Math.abs(scrollY - last) < 1) {
+                if (++n > 4) {
+                  after();
+                  return;
+                }
+              } else n = 0;
               last = scrollY;
               requestAnimationFrame(wait);
             };
@@ -1952,472 +3044,479 @@
           const id = a.getAttribute("href").slice(1);
           if (!id) return;
           e.preventDefault();
-          if (a.classList.contains("svc-cta")) {
+          if (a.classList.contains("js-prefill")) {
             const subj = document.getElementById("f-subject");
-            subj.value = a.dataset.objet;
-            sel.value = a.dataset.service;
+            subj.value = a.dataset.objet || "";
+            if (a.dataset.service) sel.value = a.dataset.service;
             setErr("f-subject", "");
             setErr("f-service", "");
             subj.classList.add("prefilled");
-            setTimeout(() => subj.classList.remove("prefilled"), 2200);
+            setTimeout(() => subj.classList.remove("prefilled"), 2400);
             goTo("contact", () =>
               document.getElementById("f-name").focus({ preventScroll: true }),
             );
           } else goTo(id);
         });
 
-        /* ---------------- NAV ---------------- */
-        const nav = document.getElementById("nav");
-        const onNav = () => nav.classList.toggle("solid", scrollY > 40);
-        addEventListener("scroll", onNav, { passive: true });
-        onNav();
-
-        /* ---------------- THREE.JS : globe + clouds ---------------- */
+        /* ================= 3D : GLOBE, NUAGES, VOYAGE ================= */
         const canvas = document.getElementById("gl");
         const sky = document.getElementById("sky");
         const boarding = document.getElementById("boarding");
+        const heroVisual = document.getElementById("hero-visual");
+        const D = Math.PI / 180,
+          R = 2.4,
+          CAMZ = 9,
+          FOV = 42;
+        const base = { x: 2.6, y: 0, s: 1 };
         let three = null;
+
         if (window.THREE) {
-          const renderer = new THREE.WebGLRenderer({
-            canvas,
-            antialias: true,
-            alpha: true,
-          });
-          renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-          const scene = new THREE.Scene();
-          scene.fog = new THREE.Fog(0xfdfcf0, 12, 55);
-          const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-          camera.position.set(0, 0, 9);
+          try {
+            const renderer = new THREE.WebGLRenderer({
+              canvas,
+              antialias: true,
+              alpha: true,
+            });
+            renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0xfdfcf0, 12, 55);
+            const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 200);
+            camera.position.set(0, 0, CAMZ);
 
-          const D = Math.PI / 180,
-            R = 2.4;
-          const ll = (lat, lon, r) => {
-            const p = (90 - lat) * D,
-              t = (lon + 180) * D;
-            return new THREE.Vector3(
-              -r * Math.sin(p) * Math.cos(t),
-              r * Math.cos(p),
-              r * Math.sin(p) * Math.sin(t),
-            );
-          };
-          const tex = (draw, s = 128) => {
-            const c = document.createElement("canvas");
-            c.width = c.height = s;
-            draw(c.getContext("2d"), s);
-            const t = new THREE.CanvasTexture(c);
-            return t;
-          };
-
-          const world = new THREE.Group();
-          scene.add(world);
-          const globe = new THREE.Group();
-          world.add(globe);
-          globe.rotation.y = 4.36;
-          globe.rotation.x = 0.28;
-
-          // core
-          const coreMat = new THREE.MeshBasicMaterial({ color: 0xf6e7d2 });
-          globe.add(
-            new THREE.Mesh(
-              new THREE.SphereGeometry(R * 0.985, 64, 64),
-              coreMat,
-            ),
-          );
-          // dotted surface
-          const N = 2600,
-            pos = new Float32Array(N * 3),
-            col = new Float32Array(N * 3);
-          const cA = new THREE.Color(C.terre),
-            cB = new THREE.Color(C.soleil);
-          for (let i = 0; i < N; i++) {
-            const y = 1 - (i / (N - 1)) * 2,
-              r = Math.sqrt(1 - y * y),
-              th = i * 2.39996;
-            pos.set([Math.cos(th) * r * R, y * R, Math.sin(th) * r * R], i * 3);
-            const m = (Math.sin(i * 0.37) + Math.sin(i * 0.051)) * 0.25 + 0.5;
-            const c = cA.clone().lerp(cB, m);
-            col.set([c.r, c.g, c.b], i * 3);
-          }
-          const colDark = new Float32Array(N * 3),
-            cA2 = new THREE.Color(C.sable);
-          for (let i = 0; i < N; i++) {
-            const m = (Math.sin(i * 0.37) + Math.sin(i * 0.051)) * 0.25 + 0.5;
-            const c = cA2.clone().lerp(cB, m);
-            colDark.set([c.r, c.g, c.b], i * 3);
-          }
-          const colLight = col.slice();
-          const pg = new THREE.BufferGeometry();
-          pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-          pg.setAttribute("color", new THREE.BufferAttribute(col, 3));
-          const dot = tex((g, s) => {
-            g.beginPath();
-            g.arc(s / 2, s / 2, s / 2 - 2, 0, 7);
-            g.fillStyle = "#fff";
-            g.fill();
-          }, 32);
-          globe.add(
-            new THREE.Points(
-              pg,
-              new THREE.PointsMaterial({
-                size: 0.045,
-                vertexColors: true,
-                map: dot,
-                transparent: true,
-                alphaTest: 0.4,
-              }),
-            ),
-          );
-          // graticule
-          const gm = new THREE.LineBasicMaterial({
-            color: 0xe37b3c,
-            transparent: true,
-            opacity: 0.22,
-          });
-          for (let lat = -60; lat <= 60; lat += 30) {
-            const pts = [];
-            for (let lo = 0; lo <= 360; lo += 6)
-              pts.push(ll(lat, lo, R * 1.002));
-            globe.add(
-              new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gm),
-            );
-          }
-          for (let lo = 0; lo < 180; lo += 30) {
-            const pts = [];
-            for (let la = -90; la <= 270; la += 6)
-              pts.push(
-                ll(la > 90 ? 180 - la : la, la > 90 ? lo + 180 : lo, R * 1.002),
+            const ll = (lat, lon, r) => {
+              const p = (90 - lat) * D,
+                t = (lon + 180) * D;
+              return new THREE.Vector3(
+                -r * Math.sin(p) * Math.cos(t),
+                r * Math.cos(p),
+                r * Math.sin(p) * Math.sin(t),
               );
+            };
+            const tex = (draw, s = 128, w) => {
+              const c = document.createElement("canvas");
+              c.width = w || s;
+              c.height = s;
+              draw(c.getContext("2d"), s, w || s);
+              return new THREE.CanvasTexture(c);
+            };
+
+            const world = new THREE.Group();
+            scene.add(world);
+            const globe = new THREE.Group();
+            world.add(globe);
+            globe.rotation.y = 4.36;
+            globe.rotation.x = 0.28;
+
+            // Noyau
+            const coreMat = new THREE.MeshBasicMaterial({ color: 0xf6e7d2 });
             globe.add(
-              new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gm),
+              new THREE.Mesh(
+                new THREE.SphereGeometry(R * 0.985, 64, 64),
+                coreMat,
+              ),
             );
-          }
 
-          // markers + labels
-          const P = {};
-          DEST.forEach((d) => (P[d.code] = ll(d.lat, d.lon, R)));
-          const pulses = [];
-          DEST.forEach((d) => {
-            const m = new THREE.Mesh(
-              new THREE.SphereGeometry(0.05, 16, 16),
-              new THREE.MeshBasicMaterial({ color: 0xe37b3c }),
+            // Atmosphère (dégradé de bord, effet fresnel)
+            const atmoMat = new THREE.ShaderMaterial({
+              uniforms: {
+                c: { value: new THREE.Color(0xe37b3c) },
+                a: { value: 0.85 },
+              },
+              vertexShader:
+                "varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+              fragmentShader:
+                "uniform vec3 c; uniform float a; varying vec3 vN; void main(){ float i = pow(clamp(0.62 - dot(vN, vec3(0.0,0.0,1.0)), 0.0, 1.0), 3.2); gl_FragColor = vec4(c, i * a); }",
+              side: THREE.BackSide,
+              transparent: true,
+              depthWrite: false,
+            });
+            world.add(
+              new THREE.Mesh(
+                new THREE.SphereGeometry(R * 1.1, 64, 64),
+                atmoMat,
+              ),
             );
-            m.position.copy(P[d.code]);
-            globe.add(m);
-            const ring = new THREE.Mesh(
-              new THREE.RingGeometry(0.07, 0.095, 32),
-              new THREE.MeshBasicMaterial({
-                color: 0xe37b3c,
-                transparent: true,
-                side: THREE.DoubleSide,
-              }),
+
+            // Surface en points (dégradé terre → soleil)
+            const N = 2800,
+              pos = new Float32Array(N * 3),
+              colLight = new Float32Array(N * 3),
+              colDark = new Float32Array(N * 3);
+            const cA = new THREE.Color(C.terre),
+              cA2 = new THREE.Color(C.sable),
+              cB = new THREE.Color(C.soleil);
+            for (let i = 0; i < N; i++) {
+              const y = 1 - (i / (N - 1)) * 2,
+                r = Math.sqrt(1 - y * y),
+                th = i * 2.39996;
+              pos.set(
+                [Math.cos(th) * r * R, y * R, Math.sin(th) * r * R],
+                i * 3,
+              );
+              const m = (Math.sin(i * 0.37) + Math.sin(i * 0.051)) * 0.25 + 0.5;
+              const c1 = cA.clone().lerp(cB, m),
+                c2 = cA2.clone().lerp(cB, m);
+              colLight.set([c1.r, c1.g, c1.b], i * 3);
+              colDark.set([c2.r, c2.g, c2.b], i * 3);
+            }
+            const pg = new THREE.BufferGeometry();
+            pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+            pg.setAttribute(
+              "color",
+              new THREE.BufferAttribute(colLight.slice(), 3),
             );
-            ring.position.copy(P[d.code].clone().multiplyScalar(1.004));
-            ring.lookAt(P[d.code].clone().multiplyScalar(2));
-            globe.add(ring);
-            pulses.push(ring);
-            const lt = tex((g, s) => {
-              g.clearRect(0, 0, s, s / 2);
-              g.fillStyle = "rgba(58,39,29,.92)";
-              const w = s * 0.8,
-                h = s * 0.3,
-                x = (s - w) / 2,
-                y = s * 0.1;
+            const dot = tex((g, s) => {
               g.beginPath();
-              g.roundRect ? g.roundRect(x, y, w, h, 10) : g.rect(x, y, w, h);
+              g.arc(s / 2, s / 2, s / 2 - 2, 0, 7);
+              g.fillStyle = "#fff";
               g.fill();
-              g.fillStyle = "#F1A55B";
-              g.font = '500 30px "DM Mono", monospace';
-              g.textAlign = "center";
-              g.textBaseline = "middle";
-              g.fillText(d.code, s / 2, y + h / 2 + 1);
-            }, 128);
-            const sp = new THREE.Sprite(
-              new THREE.SpriteMaterial({
-                map: lt,
-                transparent: true,
-                depthWrite: false,
-              }),
+            }, 32);
+            globe.add(
+              new THREE.Points(
+                pg,
+                new THREE.PointsMaterial({
+                  size: 0.046,
+                  vertexColors: true,
+                  map: dot,
+                  transparent: true,
+                  alphaTest: 0.4,
+                }),
+              ),
             );
-            sp.scale.set(0.55, 0.55, 1);
-            sp.position.copy(P[d.code].clone().multiplyScalar(1.12));
-            globe.add(sp);
-          });
 
-          // flight arcs
-          let arcMatB = null;
-          const ROUTES = [
-            ["CDG", "JFK"],
-            ["CDG", "RAK"],
-            ["CDG", "IST"],
-            ["IST", "DXB"],
-            ["DXB", "MLE"],
-            ["DXB", "HND"],
-            ["NBO", "DXB"],
-            ["RAK", "JFK"],
-            ["NBO", "CDG"],
-          ];
-          const arcs = ROUTES.map(([a, b], i) => {
-            const A = P[a],
-              B = P[b],
-              dist = A.distanceTo(B);
-            const mid = A.clone()
-              .add(B)
-              .multiplyScalar(0.5)
-              .normalize()
-              .multiplyScalar(R + dist * 0.38);
-            const curve = new THREE.QuadraticBezierCurve3(A, mid, B);
-            const g = new THREE.BufferGeometry().setFromPoints(
-              curve.getPoints(80),
-            );
-            const line = new THREE.Line(
-              g,
-              i % 2
-                ? (arcMatB =
-                    arcMatB ||
-                    new THREE.LineBasicMaterial({
-                      color: 0x5b3e2f,
-                      transparent: true,
-                      opacity: 0.85,
-                    }))
-                : new THREE.LineBasicMaterial({
-                    color: 0xe37b3c,
-                    transparent: true,
-                    opacity: 0.85,
-                  }),
-            );
-            g.setDrawRange(0, 0);
-            globe.add(line);
-            return { curve, g, off: i * 0.11 };
-          });
-
-          // airplane
-          const planeG = new THREE.Group();
-          const pm = new THREE.MeshBasicMaterial({ color: 0x5b3e2f });
-          const body = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.025, 0.04, 0.32, 10),
-            pm,
-          );
-          body.rotation.x = Math.PI / 2;
-          planeG.add(body);
-          const wing = new THREE.Mesh(
-            new THREE.BoxGeometry(0.34, 0.012, 0.08),
-            pm,
-          );
-          wing.position.z = 0.02;
-          planeG.add(wing);
-          const tail = new THREE.Mesh(
-            new THREE.BoxGeometry(0.13, 0.01, 0.05),
-            pm,
-          );
-          tail.position.z = -0.13;
-          planeG.add(tail);
-          const fin = new THREE.Mesh(
-            new THREE.BoxGeometry(0.01, 0.07, 0.05),
-            pm,
-          );
-          fin.position.set(0, 0.035, -0.13);
-          planeG.add(fin);
-          globe.add(planeG);
-
-          // glow + sun
-          const glowT = tex((g, s) => {
-            const gr = g.createRadialGradient(
-              s / 2,
-              s / 2,
-              s * 0.18,
-              s / 2,
-              s / 2,
-              s / 2,
-            );
-            gr.addColorStop(0, "rgba(241,165,91,.55)");
-            gr.addColorStop(0.5, "rgba(227,123,60,.18)");
-            gr.addColorStop(1, "rgba(227,123,60,0)");
-            g.fillStyle = gr;
-            g.fillRect(0, 0, s, s);
-          }, 256);
-          const glow = new THREE.Sprite(
-            new THREE.SpriteMaterial({
-              map: glowT,
+            // Parallèles et méridiens
+            const gm = new THREE.LineBasicMaterial({
+              color: 0xe37b3c,
               transparent: true,
-              depthWrite: false,
-              fog: false,
-            }),
-          );
-          glow.scale.set(R * 3.6, R * 3.6, 1);
-          glow.position.z = -0.5;
-          world.add(glow);
-          const sunT = tex((g, s) => {
-            const gr = g.createRadialGradient(
-              s / 2,
-              s / 2,
-              0,
-              s / 2,
-              s / 2,
-              s / 2,
-            );
-            gr.addColorStop(0, "rgba(253,240,214,1)");
-            gr.addColorStop(0.25, "rgba(241,165,91,.95)");
-            gr.addColorStop(0.5, "rgba(227,123,60,.35)");
-            gr.addColorStop(1, "rgba(227,123,60,0)");
-            g.fillStyle = gr;
-            g.fillRect(0, 0, s, s);
-          }, 256);
-          const sun = new THREE.Sprite(
-            new THREE.SpriteMaterial({
-              map: sunT,
-              transparent: true,
-              depthWrite: false,
-              fog: false,
-            }),
-          );
-          sun.scale.set(16, 16, 1);
-          sun.position.set(6, 4, -40);
-          scene.add(sun);
+              opacity: 0.2,
+            });
+            for (let lat = -60; lat <= 60; lat += 30) {
+              const pts = [];
+              for (let lo = 0; lo <= 360; lo += 6)
+                pts.push(ll(lat, lo, R * 1.002));
+              globe.add(
+                new THREE.Line(
+                  new THREE.BufferGeometry().setFromPoints(pts),
+                  gm,
+                ),
+              );
+            }
+            for (let lo = 0; lo < 180; lo += 30) {
+              const pts = [];
+              for (let la = -90; la <= 270; la += 6)
+                pts.push(
+                  ll(
+                    la > 90 ? 180 - la : la,
+                    la > 90 ? lo + 180 : lo,
+                    R * 1.002,
+                  ),
+                );
+              globe.add(
+                new THREE.Line(
+                  new THREE.BufferGeometry().setFromPoints(pts),
+                  gm,
+                ),
+              );
+            }
 
-          // clouds
-          const cloudT = tex((g, s) => {
-            for (let i = 0; i < 14; i++) {
-              const x = s * (0.2 + Math.random() * 0.6),
-                y = s * (0.35 + Math.random() * 0.3),
-                r = s * (0.12 + Math.random() * 0.16);
-              const gr = g.createRadialGradient(x, y, 0, x, y, r);
-              gr.addColorStop(0, "rgba(255,253,245,.75)");
-              gr.addColorStop(1, "rgba(255,253,245,0)");
+            // Repères + étiquettes
+            const P = {};
+            DEST.forEach((d) => (P[d.code] = ll(d.lat, d.lon, R)));
+            const pulses = [];
+            DEST.forEach((d) => {
+              const m = new THREE.Mesh(
+                new THREE.SphereGeometry(0.05, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xe37b3c }),
+              );
+              m.position.copy(P[d.code]);
+              globe.add(m);
+              const ring = new THREE.Mesh(
+                new THREE.RingGeometry(0.07, 0.095, 32),
+                new THREE.MeshBasicMaterial({
+                  color: 0xe37b3c,
+                  transparent: true,
+                  side: THREE.DoubleSide,
+                }),
+              );
+              ring.position.copy(P[d.code].clone().multiplyScalar(1.004));
+              ring.lookAt(P[d.code].clone().multiplyScalar(2));
+              globe.add(ring);
+              pulses.push(ring);
+              const lt = tex(
+                (g, s, w) => {
+                  const h = s * 0.62,
+                    x = 4,
+                    y = (s - h) / 2,
+                    ww = w - 8,
+                    r = h / 2;
+                  g.fillStyle = "rgba(58,39,29,.94)";
+                  g.beginPath();
+                  g.moveTo(x + r, y);
+                  g.arcTo(x + ww, y, x + ww, y + h, r);
+                  g.arcTo(x + ww, y + h, x, y + h, r);
+                  g.arcTo(x, y + h, x, y, r);
+                  g.arcTo(x, y, x + ww, y, r);
+                  g.fill();
+                  g.fillStyle = "#F1A55B";
+                  g.font = '600 34px Jost, "Segoe UI", sans-serif';
+                  g.textAlign = "center";
+                  g.textBaseline = "middle";
+                  g.fillText(d.code.split("").join(" "), w / 2, s / 2 + 1);
+                },
+                64,
+                160,
+              );
+              const sp = new THREE.Sprite(
+                new THREE.SpriteMaterial({
+                  map: lt,
+                  transparent: true,
+                  depthWrite: false,
+                }),
+              );
+              sp.scale.set(0.62, 0.25, 1);
+              sp.position.copy(P[d.code].clone().multiplyScalar(1.13));
+              globe.add(sp);
+            });
+
+            // Itinéraires
+            const ROUTES = [
+              ["CDG", "JFK"],
+              ["CDG", "RAK"],
+              ["CDG", "IST"],
+              ["IST", "DXB"],
+              ["DXB", "MLE"],
+              ["DXB", "HND"],
+              ["NBO", "DXB"],
+              ["RAK", "JFK"],
+              ["NBO", "CDG"],
+            ];
+            const arcMatA = new THREE.LineBasicMaterial({
+              color: 0xe37b3c,
+              transparent: true,
+              opacity: 0.9,
+            });
+            const arcMatB = new THREE.LineBasicMaterial({
+              color: 0x5b3e2f,
+              transparent: true,
+              opacity: 0.8,
+            });
+            const arcs = ROUTES.map(([a, b], i) => {
+              const A = P[a],
+                B = P[b],
+                dist = A.distanceTo(B);
+              const mid = A.clone()
+                .add(B)
+                .multiplyScalar(0.5)
+                .normalize()
+                .multiplyScalar(R + dist * 0.38);
+              const curve = new THREE.QuadraticBezierCurve3(A, mid, B);
+              const g = new THREE.BufferGeometry().setFromPoints(
+                curve.getPoints(80),
+              );
+              g.setDrawRange(0, 0);
+              globe.add(new THREE.Line(g, i % 2 ? arcMatB : arcMatA));
+              return { curve, g, off: i * 0.11 };
+            });
+
+            // Avion
+            const planeG = new THREE.Group();
+            const pm = new THREE.MeshBasicMaterial({ color: 0x5b3e2f });
+            const body = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.025, 0.04, 0.32, 10),
+              pm,
+            );
+            body.rotation.x = Math.PI / 2;
+            planeG.add(body);
+            const wing = new THREE.Mesh(
+              new THREE.BoxGeometry(0.34, 0.012, 0.08),
+              pm,
+            );
+            wing.position.z = 0.02;
+            planeG.add(wing);
+            const tail = new THREE.Mesh(
+              new THREE.BoxGeometry(0.13, 0.01, 0.05),
+              pm,
+            );
+            tail.position.z = -0.13;
+            planeG.add(tail);
+            const fin = new THREE.Mesh(
+              new THREE.BoxGeometry(0.01, 0.07, 0.05),
+              pm,
+            );
+            fin.position.set(0, 0.035, -0.13);
+            planeG.add(fin);
+            globe.add(planeG);
+
+            // Halo + soleil
+            const glowT = tex((g, s) => {
+              const gr = g.createRadialGradient(
+                s / 2,
+                s / 2,
+                s * 0.2,
+                s / 2,
+                s / 2,
+                s / 2,
+              );
+              gr.addColorStop(0, "rgba(241,165,91,.4)");
+              gr.addColorStop(0.5, "rgba(227,123,60,.12)");
+              gr.addColorStop(1, "rgba(227,123,60,0)");
               g.fillStyle = gr;
               g.fillRect(0, 0, s, s);
-            }
-          }, 256);
-          const clouds = new THREE.Group();
-          scene.add(clouds);
-          for (let i = 0; i < 150; i++) {
-            const m = new THREE.SpriteMaterial({
-              map: cloudT,
-              transparent: true,
-              depthWrite: false,
-              opacity: 0.55 + Math.random() * 0.4,
-              color: new THREE.Color().setHSL(
-                0.07,
-                0.6,
-                0.93 + Math.random() * 0.06,
-              ),
-            });
-            const s = new THREE.Sprite(m);
-            const sc = 5 + Math.random() * 9;
-            s.scale.set(sc, sc * 0.55, 1);
-            const side = Math.random() < 0.5 ? -1 : 1;
-            s.position.set(
-              side * (1.5 + Math.random() * 10),
-              (Math.random() - 0.55) * 7,
-              -8 - Math.random() * 70,
-            );
-            s.userData.v = 0.2 + Math.random() * 0.5;
-            clouds.add(s);
-          }
-          // birds of light (particles drifting)
-          const dustN = 400,
-            dp = new Float32Array(dustN * 3);
-          for (let i = 0; i < dustN; i++) {
-            dp.set(
-              [
-                (Math.random() - 0.5) * 30,
-                (Math.random() - 0.5) * 16,
-                -Math.random() * 80 + 6,
-              ],
-              i * 3,
-            );
-          }
-          const dg = new THREE.BufferGeometry();
-          dg.setAttribute("position", new THREE.BufferAttribute(dp, 3));
-          scene.add(
-            new THREE.Points(
-              dg,
-              new THREE.PointsMaterial({
-                color: 0xe37b3c,
-                size: 0.06,
-                map: dot,
+            }, 256);
+            const glow = new THREE.Sprite(
+              new THREE.SpriteMaterial({
+                map: glowT,
                 transparent: true,
-                alphaTest: 0.4,
-                opacity: 0.7,
+                depthWrite: false,
+                fog: false,
               }),
-            ),
-          );
-
-          three = {
-            renderer,
-            scene,
-            camera,
-            world,
-            globe,
-            glow,
-            arcs,
-            planeG,
-            pulses,
-            clouds,
-            sun,
-          };
-          three.applyTheme = (dark) => {
-            coreMat.color.set(dark ? 0x2b1e17 : 0xf6e7d2);
-            pg.attributes.color.array.set(dark ? colDark : colLight);
-            pg.attributes.color.needsUpdate = true;
-            if (arcMatB) arcMatB.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
-            pm.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
-            clouds.children.forEach((c) => {
-              c.material.color.setHSL(
-                0.06,
-                dark ? 0.35 : 0.6,
-                dark ? 0.3 + Math.random() * 0.08 : 0.93 + Math.random() * 0.06,
+            );
+            glow.scale.set(R * 3.8, R * 3.8, 1);
+            glow.position.z = -1;
+            world.add(glow);
+            const sunT = tex((g, s) => {
+              const gr = g.createRadialGradient(
+                s / 2,
+                s / 2,
+                0,
+                s / 2,
+                s / 2,
+                s / 2,
               );
-            });
-            sun.material.opacity = dark ? 0.55 : 1;
-            glow.material.opacity = dark ? 0.8 : 1;
-          };
+              gr.addColorStop(0, "rgba(253,240,214,1)");
+              gr.addColorStop(0.25, "rgba(241,165,91,.95)");
+              gr.addColorStop(0.5, "rgba(227,123,60,.35)");
+              gr.addColorStop(1, "rgba(227,123,60,0)");
+              g.fillStyle = gr;
+              g.fillRect(0, 0, s, s);
+            }, 256);
+            const sun = new THREE.Sprite(
+              new THREE.SpriteMaterial({
+                map: sunT,
+                transparent: true,
+                depthWrite: false,
+                fog: false,
+              }),
+            );
+            sun.scale.set(16, 16, 1);
+            sun.position.set(6, 4, -40);
+            scene.add(sun);
+
+            // Nuages
+            const cloudT = tex((g, s) => {
+              for (let i = 0; i < 14; i++) {
+                const x = s * (0.2 + Math.random() * 0.6),
+                  y = s * (0.35 + Math.random() * 0.3),
+                  r = s * (0.12 + Math.random() * 0.16);
+                const gr = g.createRadialGradient(x, y, 0, x, y, r);
+                gr.addColorStop(0, "rgba(255,253,245,.75)");
+                gr.addColorStop(1, "rgba(255,253,245,0)");
+                g.fillStyle = gr;
+                g.fillRect(0, 0, s, s);
+              }
+            }, 256);
+            const clouds = new THREE.Group();
+            scene.add(clouds);
+            for (let i = 0; i < 150; i++) {
+              const s = new THREE.Sprite(
+                new THREE.SpriteMaterial({
+                  map: cloudT,
+                  transparent: true,
+                  depthWrite: false,
+                  opacity: 0.55 + Math.random() * 0.4,
+                }),
+              );
+              const sc = 5 + Math.random() * 9;
+              s.scale.set(sc, sc * 0.55, 1);
+              const side = Math.random() < 0.5 ? -1 : 1;
+              s.position.set(
+                side * (1.5 + Math.random() * 10),
+                (Math.random() - 0.55) * 7,
+                -8 - Math.random() * 70,
+              );
+              s.userData = { v: 0.2 + Math.random() * 0.5, l: Math.random() };
+              clouds.add(s);
+            }
+            // Poussière lumineuse
+            const dustN = 400,
+              dp = new Float32Array(dustN * 3);
+            for (let i = 0; i < dustN; i++)
+              dp.set(
+                [
+                  (Math.random() - 0.5) * 30,
+                  (Math.random() - 0.5) * 16,
+                  -Math.random() * 80 + 6,
+                ],
+                i * 3,
+              );
+            const dg = new THREE.BufferGeometry();
+            dg.setAttribute("position", new THREE.BufferAttribute(dp, 3));
+            scene.add(
+              new THREE.Points(
+                dg,
+                new THREE.PointsMaterial({
+                  color: 0xe37b3c,
+                  size: 0.06,
+                  map: dot,
+                  transparent: true,
+                  alphaTest: 0.4,
+                  opacity: 0.7,
+                }),
+              ),
+            );
+
+            const applyTheme3D = (dark) => {
+              coreMat.color.set(dark ? 0x2a1d15 : 0xf6e7d2);
+              pg.attributes.color.array.set(dark ? colDark : colLight);
+              pg.attributes.color.needsUpdate = true;
+              arcMatB.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
+              pm.color.set(dark ? 0xf2dcc2 : 0x5b3e2f);
+              atmoMat.uniforms.a.value = dark ? 0.7 : 0.45;
+              clouds.children.forEach((c) =>
+                c.material.color.setHSL(
+                  0.06,
+                  dark ? 0.35 : 0.6,
+                  dark ? 0.3 + c.userData.l * 0.08 : 0.93 + c.userData.l * 0.06,
+                ),
+              );
+              sun.material.opacity = dark ? 0.55 : 1;
+              glow.material.opacity = dark ? 0.9 : 1;
+            };
+            three = {
+              renderer,
+              scene,
+              camera,
+              world,
+              globe,
+              arcs,
+              planeG,
+              pulses,
+              clouds,
+              applyTheme3D,
+            };
+          } catch (err) {
+            three = null;
+            canvas.remove();
+          }
         }
 
-        /* ---------------- SKY + SCROLL STATE ---------------- */
+        /* ================= CIEL, THÈME, DÉFILEMENT ================= */
         const lerp = (a, b, t) => a + (b - a) * t,
           clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)),
           ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
         const STOPS_DAY = [
           [0, "#FDFCF0"],
-          [0.45, "#F9E2C6"],
-          [0.8, "#F3B884"],
-          [1, "#E9955C"],
+          [0.4, "#FAE6CC"],
+          [0.75, "#F4BE8A"],
+          [1, "#EA9A60"],
         ];
         const STOPS_NIGHT = [
-          [0, "#1C130E"],
-          [0.45, "#2A1A12"],
-          [0.8, "#4E2817"],
+          [0, "#1A120D"],
+          [0.4, "#2A1A12"],
+          [0.75, "#4E2817"],
           [1, "#7A3A1E"],
         ];
         let STOPS = STOPS_DAY;
-        const darkMQ = matchMedia("(prefers-color-scheme: dark)");
-        const isDark = () => {
-          const t = document.documentElement.getAttribute("data-theme");
-          return t ? t === "dark" : darkMQ.matches;
-        };
-        function applyTheme() {
-          const d = isDark();
-          STOPS = d ? STOPS_NIGHT : STOPS_DAY;
-          if (three && three.applyTheme) three.applyTheme(d);
-          document
-            .querySelectorAll("[data-theme-toggle]")
-            .forEach((b) => b.setAttribute("aria-pressed", String(d)));
-          if (typeof measure === "function") measure();
-        }
-        document.querySelectorAll("[data-theme-toggle]").forEach((b) =>
-          b.addEventListener("click", () => {
-            const next = isDark() ? "light" : "dark";
-            document.documentElement.setAttribute("data-theme", next);
-            try {
-              localStorage.setItem("ts-theme", next);
-            } catch (e) {}
-            applyTheme();
-          }),
-        );
-        darkMQ.addEventListener?.("change", () => {
-          if (!document.documentElement.getAttribute("data-theme"))
-            applyTheme();
-        });
         const hex2 = (h) =>
           [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
         const skyAt = (t) => {
@@ -2438,61 +3537,109 @@
           mx = 0,
           my = 0;
         const pass = document.getElementById("pass"),
-          bTitle = document.getElementById("b-title");
+          board = document.getElementById("board"),
+          bHead = document.getElementById("b-head");
         function measure() {
           const top = boarding.offsetTop,
             h = boarding.offsetHeight;
-          const end = top + h - innerHeight;
-          journey = clamp(scrollY / Math.max(1, end));
+          journey = clamp(scrollY / Math.max(1, top + h - innerHeight));
           const bp = clamp((scrollY - top) / Math.max(1, h - innerHeight));
-          const rgb = skyAt(journey);
-          sky.style.background = `rgb(${rgb.join(",")})`;
+          const a = skyAt(journey),
+            b = skyAt(Math.min(1, journey + 0.3));
+          sky.style.background = `linear-gradient(180deg, rgb(${a}) 0%, rgb(${b}) 100%)`;
           if (three)
-            three.scene.fog.color.setRGB(
-              rgb[0] / 255,
-              rgb[1] / 255,
-              rgb[2] / 255,
-            );
+            three.scene.fog.color.setRGB(a[0] / 255, a[1] / 255, a[2] / 255);
           if (!reduced) {
-            const f = ease(clamp((bp - 0.05) / 0.5));
-            pass.style.transform = `rotateX(${lerp(72, 0, f)}deg) translateY(${lerp(120, 0, f)}px) scale(${lerp(0.8, 1, f)})`;
-            pass.style.opacity = lerp(0.25, 1, f);
-            const out = clamp((bp - 0.82) / 0.18);
-            bTitle.style.transform = `translateZ(0) scale(${lerp(1, 1.15, out)})`;
-            bTitle.parentElement.style.opacity = 1 - out * 0.85;
+            const f = ease(clamp((bp - 0.04) / 0.5));
+            pass.style.transform = `rotateX(${lerp(70, 0, f)}deg) translateY(${lerp(120, 0, f)}px) scale(${lerp(0.82, 1, f)})`;
+            pass.style.opacity = lerp(0.2, 1, f);
+            const g = ease(clamp((bp - 0.14) / 0.5));
+            board.style.transform = `rotateY(${lerp(-38, 0, g)}deg) translateX(${lerp(120, 0, g)}px)`;
+            board.style.opacity = lerp(0, 1, g);
+            if (g > 0.05) shuffleBoard();
+            const out = clamp((bp - 0.84) / 0.16);
+            bHead.style.transform = `scale(${lerp(1, 1.1, out)})`;
+            bHead.parentElement.style.opacity = 1 - out * 0.8;
           }
-          canvas.style.opacity =
-            scrollY > boarding.offsetTop + boarding.offsetHeight ? 0 : 1;
+          canvas.style.visibility =
+            scrollY > boarding.offsetTop + boarding.offsetHeight
+              ? "hidden"
+              : "visible";
         }
-        addEventListener("scroll", measure, { passive: true });
+
+        const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+        const isDark = () => {
+          const t = document.documentElement.getAttribute("data-theme");
+          return t ? t === "dark" : darkMQ.matches;
+        };
+        function applyTheme() {
+          const d = isDark();
+          STOPS = d ? STOPS_NIGHT : STOPS_DAY;
+          if (three) three.applyTheme3D(d);
+          document
+            .querySelectorAll("[data-theme-toggle]")
+            .forEach((b) => b.setAttribute("aria-pressed", String(d)));
+          measure();
+        }
+        document.querySelectorAll("[data-theme-toggle]").forEach((b) =>
+          b.addEventListener("click", () => {
+            const next = isDark() ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("ts-theme", next);
+            } catch (e) {}
+            applyTheme();
+          }),
+        );
+        if (darkMQ.addEventListener)
+          darkMQ.addEventListener("change", () => {
+            if (!document.documentElement.getAttribute("data-theme"))
+              applyTheme();
+          });
+
+        // Cartes flottantes : parallaxe à la souris
+        const floats = [...document.querySelectorAll(".float-card")];
         addEventListener(
           "pointermove",
           (e) => {
             mx = e.clientX / innerWidth - 0.5;
             my = e.clientY / innerHeight - 0.5;
+            if (!reduced)
+              floats.forEach((f) => {
+                const d = +f.dataset.depth;
+                f.style.transform = `translate3d(${-mx * d}px,${-my * d}px,0)`;
+              });
           },
           { passive: true },
         );
 
+        function placeGlobe() {
+          const r = heroVisual.getBoundingClientRect();
+          const upp = (2 * CAMZ * Math.tan((FOV / 2) * D)) / innerHeight;
+          const cx = r.left + r.width / 2,
+            cy = r.top + scrollY + r.height / 2;
+          base.x = (cx - innerWidth / 2) * upp;
+          base.y = -(cy - innerHeight / 2) * upp;
+          base.s = (Math.min(r.width, r.height) * upp * 0.42) / R;
+        }
         function resize() {
+          placeGlobe();
           if (!three) return;
-          const w = innerWidth,
-            h = innerHeight;
-          three.renderer.setSize(w, h, false);
-          three.camera.aspect = w / h;
+          three.renderer.setSize(innerWidth, innerHeight, false);
+          three.camera.aspect = innerWidth / innerHeight;
           three.camera.updateProjectionMatrix();
         }
+        addEventListener("scroll", measure, { passive: true });
         addEventListener("resize", () => {
           resize();
           measure();
         });
 
-        const clockT = three ? new THREE.Clock() : null;
+        const clock3 = three ? new THREE.Clock() : null;
         function loop() {
           requestAnimationFrame(loop);
-          if (!three) return;
-          if (canvas.style.opacity === "0") return;
-          const t = clockT.getElapsedTime();
+          if (!three || canvas.style.visibility === "hidden") return;
+          const t = clock3.getElapsedTime();
           const {
             camera,
             world,
@@ -2504,38 +3651,32 @@
             renderer,
             scene,
           } = three;
-          const mobile = innerWidth < 768;
           const j = ease(journey);
-          // globe position: right side in hero, slides away during take-off
-          const baseX = mobile ? 0 : 2.2,
-            baseY = mobile ? 0.9 : 0.1,
-            baseS = mobile ? 0.78 : 1;
+          const upp = (2 * CAMZ * Math.tan((FOV / 2) * D)) / innerHeight;
+          const lift = Math.min(scrollY, innerHeight) * upp * 0.5;
           world.position.set(
-            lerp(baseX, mobile ? -7 : -9, j),
-            lerp(baseY, 2.5, j),
+            lerp(base.x, base.x > 0.5 ? -9 : -6, j),
+            lerp(base.y + lift, 3, j),
             lerp(0, 2, j),
           );
-          world.scale.setScalar(baseS * lerp(1, 0.7, j));
-          globe.rotation.y += reduced ? 0 : 0.0016;
-          // camera flies forward through the clouds
-          camera.position.z = lerp(9, -52, j);
-          camera.position.x += (mx * 0.8 - camera.position.x) * 0.04;
+          world.scale.setScalar(base.s * lerp(1, 0.7, j));
+          if (!reduced) globe.rotation.y += 0.0016;
+          camera.position.z = lerp(CAMZ, -52, j);
+          camera.position.x += (mx * 0.6 - camera.position.x) * 0.04;
           camera.position.y +=
-            (-my * 0.5 + lerp(0, -0.5, j) - camera.position.y) * 0.04;
+            (-my * 0.4 + lerp(0, -0.5, j) - camera.position.y) * 0.04;
           camera.lookAt(
             camera.position.x * 0.3,
             camera.position.y * 0.3,
             camera.position.z - 10,
           );
           camera.rotation.z = lerp(0, -0.06, Math.sin(j * Math.PI));
-          // arcs draw in loop
           arcs.forEach((a) => {
             const k = (t * 0.18 + a.off) % 1.4;
             const n = Math.floor(clamp(k) * 81);
             const s = k > 1 ? Math.floor(((k - 1) / 0.4) * 81) : 0;
             a.g.setDrawRange(s, Math.max(0, n - s));
           });
-          // plane following the active arc
           const leg = Math.floor(t / 5) % arcs.length,
             lt = (t % 5) / 5,
             cur = arcs[leg].curve;
@@ -2555,32 +3696,35 @@
         applyTheme();
         loop();
 
-        /* ---------------- GSAP ---------------- */
+        /* ================= ANIMATIONS AU DÉFILEMENT (GSAP) ================= */
         if (window.gsap && window.ScrollTrigger) {
           gsap.registerPlugin(ScrollTrigger);
           if (!reduced) {
             gsap.from(".hero-in", {
-              y: 30,
+              y: 32,
               opacity: 0.15,
               duration: 1.1,
               ease: "power3.out",
-              stagger: 0.12,
+              stagger: 0.1,
             });
 
-            // Horizontal services corridor
+            // Couloir horizontal des services
             const svc = document.getElementById("services");
             const cards = [...document.querySelectorAll(".svc")];
             const done = document.getElementById("route-done"),
-              rplane = document.getElementById("route-plane");
+              rplane = document.getElementById("route-plane"),
+              count = document.getElementById("svc-count");
             const dist = () => Math.max(0, track.scrollWidth - innerWidth);
             const depth3D = () => {
+              const sr = svc.getBoundingClientRect();
+              if (sr.bottom < 0 || sr.top > innerHeight) return;
               const vw = innerWidth,
                 cx = vw / 2;
               cards.forEach((c) => {
                 const r = c.getBoundingClientRect();
                 const d = (r.left + r.width / 2 - cx) / vw;
                 const ad = Math.min(1.2, Math.abs(d));
-                c.style.transform = `translateZ(${-ad * 260}px) rotateY(${clamp(-d * 42, -50, 50)}deg) rotateZ(${d * -2}deg)`;
+                c.style.transform = `translateZ(${-ad * 240}px) rotateY(${clamp(-d * 40, -48, 48)}deg) rotateZ(${d * -2}deg)`;
                 c.style.opacity = String(clamp(1.25 - ad * 0.7, 0.35, 1));
                 c.style.zIndex = String(100 - Math.round(ad * 50));
               });
@@ -2600,30 +3744,29 @@
                   svc.style.setProperty("--p", p.toFixed(3));
                   done.style.width = p * 100 + "%";
                   rplane.style.left = p * 100 + "%";
+                  count.textContent =
+                    String(Math.min(8, Math.floor(p * 8) + 1)).padStart(
+                      2,
+                      "0",
+                    ) + " / 08";
                 },
               },
             });
             gsap.ticker.add(depth3D);
             depth3D();
 
-            // Destinations: cards fold up into place
+            // Destinations : les cartes se déplient en 3D
             gsap.utils.toArray(".dest").forEach((el, i) => {
               gsap.from(el, {
-                rotateX: 28,
-                y: 80,
-                z: -120,
+                rotateX: 24,
+                y: 70,
                 opacity: 0.3,
-                duration: 1,
+                duration: 1.1,
                 ease: "power3.out",
-                delay: (i % 4) * 0.08,
-                scrollTrigger: {
-                  trigger: el,
-                  start: "top 92%",
-                  toggleActions: "play none none reverse",
-                },
+                delay: (i % 4) * 0.07,
+                scrollTrigger: { trigger: el, start: "top 92%" },
               });
             });
-            // generic reveals (start visible-ish, never fully hidden)
             gsap.utils.toArray(".reveal").forEach((el) => {
               gsap.from(el, {
                 y: 40,
@@ -2634,25 +3777,35 @@
               });
             });
             const sl = document.getElementById("step-line");
-            if (sl)
-              gsap.fromTo(
-                sl,
-                { scaleX: 0 },
-                {
-                  scaleX: 1,
-                  ease: "none",
-                  scrollTrigger: {
-                    trigger: "#etapes",
-                    start: "top 70%",
-                    end: "center 50%",
-                    scrub: true,
-                  },
+            gsap.fromTo(
+              sl,
+              { scaleX: 0 },
+              {
+                scaleX: 1,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: "#etapes",
+                  start: "top 65%",
+                  end: "center 50%",
+                  scrub: true,
                 },
-              );
+              },
+            );
           }
+          addEventListener("load", () => {
+            ScrollTrigger.refresh();
+            resize();
+            measure();
+          });
+          if (document.fonts && document.fonts.ready)
+            document.fonts.ready.then(() => {
+              ScrollTrigger.refresh();
+              resize();
+              measure();
+            });
         }
 
-        /* Destination 3D tilt with layered parallax */
+        // Cartes destinations : inclinaison 3D et calques en parallaxe
         if (!reduced)
           document.querySelectorAll(".dest").forEach((el) => {
             const inner = el.querySelector(".dest-inner"),
@@ -2661,7 +3814,7 @@
               const r = el.getBoundingClientRect();
               const x = (e.clientX - r.left) / r.width - 0.5,
                 y = (e.clientY - r.top) / r.height - 0.5;
-              inner.style.transform = `rotateY(${x * 18}deg) rotateX(${-y * 14}deg) scale(1.03)`;
+              inner.style.transform = `rotateY(${x * 14}deg) rotateX(${-y * 11}deg) scale(1.02)`;
               layers.forEach((l) => {
                 const z = +l.dataset.z;
                 l.style.transform = `translate3d(${-x * z * 0.35}px,${-y * z * 0.3}px,${z}px)`;
@@ -2673,22 +3826,20 @@
             });
           });
 
-        /* ---------------- CONTACT FORM ---------------- */
-        const form = document.getElementById("form"),
-          status = document.getElementById("f-status"),
-          btn = document.getElementById("f-submit");
-        const copyText = async (txt, button, done = "Copié") => {
+        /* ================= FORMULAIRE ================= */
+        const status = document.getElementById("f-status"),
+          btn = document.getElementById("f-submit"),
+          lbl = btn.querySelector(".lbl");
+        const copyText = async (txt, button, doneLabel, nodeId) => {
           try {
             await navigator.clipboard.writeText(txt);
             const o = button.textContent;
-            button.textContent = done;
+            button.textContent = doneLabel;
             setTimeout(() => (button.textContent = o), 1800);
           } catch (e) {
-            const r = document.createRange();
-            const n = document.getElementById(
-              button.dataset.target || "mail-addr",
-            );
+            const n = document.getElementById(nodeId);
             if (n) {
+              const r = document.createRange();
               r.selectNodeContents(n);
               const s = getSelection();
               s.removeAllRanges();
@@ -2699,62 +3850,54 @@
         document
           .getElementById("copy-mail")
           .addEventListener("click", (e) =>
-            copyText(MAIL, e.currentTarget, "Adresse copiée"),
+            copyText(MAIL, e.currentTarget, "Adresse copiée", "mail-addr"),
           );
 
-        const setErr = (id, msg) => {
-          const s = form.querySelector(`.err[data-for="${id}"]`);
-          if (s) s.textContent = msg || "";
-        };
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const v = (id) => document.getElementById(id).value.trim();
           let ok = true;
-          setErr(
-            "f-name",
-            v("f-name") ? "" : ((ok = false), "Indiquez votre nom."),
-          );
-          setErr(
+          const check = (id, cond, msg) => {
+            setErr(id, cond ? "" : msg);
+            if (!cond) ok = false;
+          };
+          check("f-name", v("f-name"), "Indiquez votre nom.");
+          check(
             "f-email",
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("f-email"))
-              ? ""
-              : ((ok = false),
-                "Saisissez une adresse e-mail valide, par exemple vous@exemple.com."),
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("f-email")),
+            "Saisissez une adresse e-mail valide, par exemple vous@exemple.com.",
           );
-          setErr(
+          check(
             "f-subject",
-            v("f-subject")
-              ? ""
-              : ((ok = false), "Indiquez l’objet de votre demande."),
+            v("f-subject"),
+            "Indiquez l’objet de votre demande.",
           );
-          setErr(
+          check(
             "f-service",
-            v("f-service")
-              ? ""
-              : ((ok = false), "Choisissez le service qui vous intéresse."),
+            v("f-service"),
+            "Choisissez le service qui vous intéresse.",
           );
-          setErr(
+          check(
             "f-msg",
-            v("f-msg").length >= 10
-              ? ""
-              : ((ok = false),
-                "Décrivez votre projet en quelques mots (10 caractères minimum)."),
+            v("f-msg").length >= 10,
+            "Décrivez votre projet en quelques mots (10 caractères minimum).",
           );
           if (!ok) {
-            form
-              .querySelector(".err:not(:empty)")
-              ?.previousElementSibling?.focus();
+            const first = form.querySelector(".err:not(:empty)");
+            first?.parentElement
+              .querySelector("input,select,textarea")
+              ?.focus();
             return;
           }
 
           const data = Object.fromEntries(new FormData(form));
           data._subject = `${data.objet} · Demande Travel Studio`;
+          data._template = "table";
           btn.disabled = true;
-          btn.style.opacity = 0.7;
-          btn.firstChild.textContent = "Envoi en cours… ";
+          lbl.textContent = "Envoi en cours…";
           status.hidden = true;
           try {
-            // FormSubmit relaie le formulaire vers direction@travelstudio.com (activation à confirmer une fois par e-mail)
+            // FormSubmit transmet le formulaire à direction@travelstudio.com (activation à confirmer une fois par e-mail)
             const res = await fetch("https://formsubmit.co/ajax/" + MAIL, {
               method: "POST",
               headers: {
@@ -2766,25 +3909,28 @@
             const json = await res.json().catch(() => ({}));
             if (!res.ok || json.success === "false" || json.success === false)
               throw new Error("refused");
-            status.innerHTML = `<div class="rounded-xl p-4 bg-[#EAF3E6] text-[#2F5A2A]"><strong>Demande envoyée.</strong> Merci ${data.nom.split(" ")[0]}, un conseiller Travel Studio vous répondra à ${data.email}.</div>`;
+            status.innerHTML = `<div class="notice ok"><strong>Demande envoyée.</strong> Merci ${esc(data.nom.split(" ")[0])}, un conseiller Travel Studio vous répondra à ${esc(data.email)}.</div>`;
             form.reset();
           } catch (err) {
             const recap = `À : ${MAIL}\nObjet : ${data.objet}\n\nNom : ${data.nom}\nE-mail : ${data.email}\nTéléphone : ${data.telephone || "-"}\nService : ${data.service}\nDestination : ${data.destination || "-"}\nDépart : ${data.date_depart || "-"}\nVoyageurs : ${data.voyageurs || "-"}\n\n${data.message}`;
-            status.innerHTML = `<div class="rounded-xl p-4 bg-sable text-heading">
-      <strong>Votre demande n'a pas pu être transmise en ligne.</strong> Rien n'a été envoyé. Copiez le récapitulatif ci-dessous et envoyez-le par e-mail à <span class="mono select-all">${MAIL}</span>.
-      <pre id="recap" class="mt-3 p-3 rounded-lg bg-surface text-xs whitespace-pre-wrap overflow-x-auto mono"></pre>
-      <button type="button" id="copy-recap" data-target="recap" class="mt-3 btn btn-sun !py-2 !px-4 text-sm">Copier le récapitulatif</button></div>`;
+            status.innerHTML = `<div class="notice warn"><strong>Votre demande n’a pas pu être transmise en ligne.</strong> Rien n’a été envoyé. Copiez le récapitulatif et envoyez-le par e-mail à ${MAIL}.
+      <pre id="recap"></pre>
+      <button type="button" id="copy-recap" class="btn btn-sun btn-sm" style="margin-top:12px">Copier le récapitulatif</button></div>`;
             document.getElementById("recap").textContent = recap;
             document
               .getElementById("copy-recap")
               .addEventListener("click", (ev) =>
-                copyText(recap, ev.currentTarget, "Récapitulatif copié"),
+                copyText(
+                  recap,
+                  ev.currentTarget,
+                  "Récapitulatif copié",
+                  "recap",
+                ),
               );
           } finally {
             status.hidden = false;
             btn.disabled = false;
-            btn.style.opacity = 1;
-            btn.firstChild.textContent = "Envoyer ma demande ";
+            lbl.textContent = "Envoyer ma demande";
           }
         });
       })();
